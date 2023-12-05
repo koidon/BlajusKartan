@@ -1,6 +1,6 @@
 @Backend_HostAddress = http://localhost:5118
 
-GET {{Backend_HostAddress}}/weatherforecast/
+GET http://localhost:5118/getBook/2
 Accept: application/json
 
 ###
