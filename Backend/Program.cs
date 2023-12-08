@@ -27,7 +27,7 @@ app.MapPost("/createBook", (Book book, DataContext context) =>
 {
     context.Books.Add(book);
     context.SaveChanges();
-    return book;
+    return Results.Ok(book);
 });
 
 app.MapGet("/getBook{id}", (int id, DataContext context) =>
