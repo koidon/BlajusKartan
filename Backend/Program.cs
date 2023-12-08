@@ -1,3 +1,5 @@
+using System.Net.Http.Headers;
+using System.Text.Json;
 using Backend.Data;
 using Backend.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -39,15 +41,62 @@ app.MapGet("/getBook{id}", (int id, DataContext context) =>
     return book is null ? Results.NotFound() : Results.Ok(book);
 });
 
-app.MapGet("/getPoliceEvents", async ([FromServices] HttpClient httpClient) =>
+app.MapPost("/postPoliceEvents", async ([FromServices] HttpClient httpClient, DataContext dataContext) =>
 {
     var policeApiUrl = "https://polisen.se/api/events";
-    
-    var response = await httpClient.GetStringAsync(policeApiUrl);
-    
-    Console.WriteLine(response);
-    
-    return Results.Ok(response);
+
+    var commentValue = new ProductInfoHeaderValue("(+https://blaljuskartan.se)");
+
+    httpClient.DefaultRequestHeaders.UserAgent.Add(commentValue);
+
+    try
+    {
+        var response = await httpClient.GetAsync(policeApiUrl);
+
+        response.EnsureSuccessStatusCode();
+
+        await using var responseStream = await response.Content.ReadAsStreamAsync();
+
+        var policeEvents = await JsonSerializer.DeserializeAsync<List<PoliceEvent>>(responseStream,
+            new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+            });
+
+        if (policeEvents is null)
+        {
+            throw new Exception("Oväntat fel från API");
+        }
+
+        foreach (var policeEvent in policeEvents)
+        {
+            PoliceEventEntity policeEventEntity = new PoliceEventEntity
+            {
+                PoliceEvent = policeEvent
+            };
+
+            dataContext.PoliceEvents.Add(policeEventEntity);
+            await dataContext.SaveChangesAsync();
+        }
+    }
+    catch (Exception ex)
+    {
+        return Results.BadRequest("Oväntat fel från API");
+    }
+
+    return Results.Ok();
+});
+
+app.MapGet("/getPoliceEvents/{datespan}", async (string datespan, DataContext context) =>
+{
+
+     // Assuming you want events within a single day
+
+    var policeEvents = await context.PoliceEvents
+        .Where(e => e.PoliceEvent.Datetime.Contains(datespan))
+        .ToListAsync();
+
+    return policeEvents.Count == 0 ? Results.NotFound() : Results.Ok(policeEvents);
 });
 
 app.Run();
