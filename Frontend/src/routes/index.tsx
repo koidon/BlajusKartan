@@ -7,7 +7,7 @@ export const Route = new FileRoute("/").createRoute({
 });
 
 function IndexComponent() {
-  const position = [51.505, -0.09];
+  const position = { lat: 51.505, lng: -0.09 };
   return (
     <MapContainer
       center={position}
