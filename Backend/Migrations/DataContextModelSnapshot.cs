@@ -116,11 +116,11 @@ namespace Backend.Migrations
                                         .HasForeignKey("PoliceEventEntityId");
                                 });
 
-                            b1.Navigation("Location")
+                            b1.InfoPanel("Location")
                                 .IsRequired();
                         });
 
-                    b.Navigation("PoliceEvent")
+                    b.InfoPanel("PoliceEvent")
                         .IsRequired();
                 });
 #pragma warning restore 612, 618

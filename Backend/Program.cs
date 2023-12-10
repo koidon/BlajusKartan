@@ -89,9 +89,6 @@ app.MapPost("/postPoliceEvents", async ([FromServices] HttpClient httpClient, Da
 
 app.MapGet("/getPoliceEvents/{datespan}", async (string datespan, DataContext context) =>
 {
-
-     // Assuming you want events within a single day
-
     var policeEvents = await context.PoliceEvents
         .Where(e => e.PoliceEvent.Datetime.Contains(datespan))
         .ToListAsync();
