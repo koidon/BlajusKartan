@@ -9,6 +9,8 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip.tsx";
 
+
+
 const InfoPanel = () => {
   const isMobile = useMediaQuery("(max-width: 768px)");
 
@@ -98,7 +100,7 @@ const InfoPanel = () => {
       <aside
         ref={sidebarRef}
         className={cn(
-          "group/sidebar h-full bg-secondary overflow-hidden relative flex w-60 flex-col z-[9999] shrink-0",
+          "group/sidebar h-full bg-secondary overflow-hidden relative flex w-60 flex-col z-[9999]",
           isResetting && "transition-all ease-in-out duration-300",
           isMobile && "w-0",
         )}
