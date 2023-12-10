@@ -2,6 +2,7 @@ using System.Net.Http.Headers;
 using System.Text.Json;
 using Backend.Data;
 using Backend.Models;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -43,6 +44,11 @@ app.MapGet("/getBook{id}", (int id, DataContext context) =>
 
 app.MapPost("/postPoliceEvents", async ([FromServices] HttpClient httpClient, DataContext dataContext) =>
 {
+
+    var serviceResponse = new ServiceResponse<string>();
+
+
+
     var policeApiUrl = "https://polisen.se/api/events";
 
     var commentValue = new ProductInfoHeaderValue("(+https://blaljuskartan.se)");
@@ -57,43 +63,55 @@ app.MapPost("/postPoliceEvents", async ([FromServices] HttpClient httpClient, Da
 
         await using var responseStream = await response.Content.ReadAsStreamAsync();
 
-        var policeEvents = await JsonSerializer.DeserializeAsync<List<PoliceEvent>>(responseStream,
+        var policeEvents = await JsonSerializer.DeserializeAsync<ServiceResponse<List<PoliceEvent>>>(responseStream,
             new JsonSerializerOptions
             {
                 PropertyNamingPolicy = JsonNamingPolicy.CamelCase
             });
 
-        if (policeEvents is null)
-        {
-            throw new Exception("Oväntat fel från API");
-        }
 
-        foreach (var policeEvent in policeEvents)
-        {
-            PoliceEventEntity policeEventEntity = new PoliceEventEntity
+        if (policeEvents?.Data != null)
+            foreach (var policeEvent in policeEvents.Data)
             {
-                PoliceEvent = policeEvent
-            };
+                PoliceEventEntity policeEventEntity = new PoliceEventEntity
+                {
+                    PoliceEvent = policeEvent
+                };
 
-            dataContext.PoliceEvents.Add(policeEventEntity);
-            await dataContext.SaveChangesAsync();
-        }
+                dataContext.PoliceEvents.Add(policeEventEntity);
+                await dataContext.SaveChangesAsync();
+            }
+
+        return Results.Ok(policeEvents);
     }
     catch (Exception ex)
     {
+        serviceResponse.Status = false;
+        serviceResponse.Message = $"Error: {ex.Message}";
         return Results.BadRequest("Oväntat fel från API");
     }
-
-    return Results.Ok();
 });
 
 app.MapGet("/getPoliceEvents/{datespan}", async (string datespan, DataContext context) =>
 {
+    var serviceResponse = new ServiceResponse<List<PoliceEventEntity>>();
+
     var policeEvents = await context.PoliceEvents
         .Where(e => e.PoliceEvent.Datetime.Contains(datespan))
         .ToListAsync();
 
-    return policeEvents.Count == 0 ? Results.NotFound() : Results.Ok(policeEvents);
+    if (policeEvents.Count == 0)
+    {
+        serviceResponse.Message = "NotFound";
+        serviceResponse.Status = false;
+        serviceResponse.Data = null;
+        return Results.NotFound(serviceResponse);
+    }
+
+    serviceResponse.Message = "Ok";
+    serviceResponse.Data = policeEvents;
+
+    return Results.Ok(serviceResponse);
 });
 
 app.Run();
