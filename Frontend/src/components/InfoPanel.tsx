@@ -98,7 +98,7 @@ const InfoPanel = () => {
       <aside
         ref={sidebarRef}
         className={cn(
-          "group/sidebar h-full bg-secondary overflow-auto relative flex w-60 flex-col z-[9999] shrink-0",
+          "group/sidebar h-full bg-secondary overflow-hidden relative flex w-60 flex-col z-[9999] shrink-0",
           isResetting && "transition-all ease-in-out duration-300",
           isMobile && "w-0",
         )}
@@ -112,7 +112,7 @@ const InfoPanel = () => {
       <div
         ref={navbarRef}
         className={cn(
-          "fixed z-[0] top-1/2 transform -translate-y-1/2 w-[calc(100% - 320px)] overflow-hidden",
+          "fixed z-[50] top-1/2 transform -translate-y-1/2 w-[calc(100% - 320px)] overflow-hidden",
           isResetting && "transition-all ease-in-out duration-300",
           isMobile && "left-0 w-full",
         )}
