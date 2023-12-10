@@ -5,17 +5,15 @@ namespace Backend.Data;
 
 public class DataContext(DbContextOptions<DataContext> options) : DbContext(options)
 {
-   public DbSet<Book> Books => Set<Book>();
-   public DbSet<PoliceEventEntity> PoliceEvents => Set<PoliceEventEntity>();
+    public DbSet<Book> Books => Set<Book>();
+    public DbSet<PoliceEventEntity> PoliceEvents => Set<PoliceEventEntity>();
 
-   protected override void OnModelCreating(ModelBuilder modelBuilder)
-   {
-      modelBuilder.Entity<PoliceEventEntity>().OwnsOne(e => e.PoliceEvent, b =>
-      {
-         b.OwnsOne(e => e.Location);
-         b.ToJson();
-      });
-   }
-
-
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<PoliceEventEntity>().OwnsOne(e => e.PoliceEvent, b =>
+        {
+            b.OwnsOne(e => e.Location);
+            b.ToJson();
+        });
+    }
 }

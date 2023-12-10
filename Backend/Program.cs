@@ -42,11 +42,9 @@ app.MapGet("/getBook{id}", (int id, DataContext context) =>
     return book is null ? Results.NotFound() : Results.Ok(book);
 });
 
-app.MapPost("/postPoliceEvents", async ([FromServices] HttpClient httpClient, DataContext dataContext) =>
+app.MapPost("/postAllPoliceEvents", async ([FromServices] HttpClient httpClient, DataContext dataContext) =>
 {
-
     var serviceResponse = new ServiceResponse<string>();
-
 
 
     var policeApiUrl = "https://polisen.se/api/events";
@@ -92,6 +90,61 @@ app.MapPost("/postPoliceEvents", async ([FromServices] HttpClient httpClient, Da
     }
 });
 
+app.MapPost("/postNewPoliceEvents", async ([FromServices] HttpClient httpClient, DataContext dataContext) =>
+{
+    var serviceResponse = new ServiceResponse<string>();
+
+    var policeApiUrl = "https://polisen.se/api/events";
+
+    var commentValue = new ProductInfoHeaderValue("(+https://blaljuskartan.se)");
+
+    httpClient.DefaultRequestHeaders.UserAgent.Add(commentValue);
+
+    try
+    {
+        var response = await httpClient.GetAsync(policeApiUrl);
+
+        response.EnsureSuccessStatusCode();
+
+        await using var responseStream = await response.Content.ReadAsStreamAsync();
+
+        var policeEvents = await JsonSerializer.DeserializeAsync<ServiceResponse<List<PoliceEvent>>>(responseStream,
+            new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+            });
+
+        if (policeEvents?.Data != null)
+        {
+            foreach (var policeEvent in policeEvents.Data)
+            {
+                // Check if the event already exists in the database
+                var existingEvent = dataContext.PoliceEvents.FirstOrDefault(e => e.PoliceEvent.Id == policeEvent.Id);
+
+                if (existingEvent == null)
+                {
+                    // Nytt event
+                    PoliceEventEntity policeEventEntity = new PoliceEventEntity
+                    {
+                        PoliceEvent = policeEvent
+                    };
+
+                    dataContext.PoliceEvents.Add(policeEventEntity);
+                    await dataContext.SaveChangesAsync();
+                }
+            }
+        }
+
+        return Results.Ok(policeEvents);
+    }
+    catch (Exception ex)
+    {
+        serviceResponse.Status = false;
+        serviceResponse.Message = $"Error: {ex.Message}";
+        return Results.BadRequest("Oväntat fel från API");
+    }
+});
+
 app.MapGet("/getPoliceEvents/{datespan}", async (string datespan, DataContext context) =>
 {
     var serviceResponse = new ServiceResponse<List<PoliceEventEntity>>();
@@ -113,5 +166,34 @@ app.MapGet("/getPoliceEvents/{datespan}", async (string datespan, DataContext co
 
     return Results.Ok(serviceResponse);
 });
+
+app.MapGet("/getPoliceEventsByType/{type?}", async (string type, DataContext context) =>
+{
+    var serviceResponse = new ServiceResponse<List<PoliceEventEntity>>();
+
+    IQueryable<PoliceEventEntity> query = context.PoliceEvents;
+
+    // Om type (kategori) specificeras
+    if (!string.IsNullOrEmpty(type))
+    {
+        query = query.Where(e => e.PoliceEvent.Type == type);
+    }
+
+    var policeEvents = await query.ToListAsync();
+
+    if (policeEvents.Count == 0)
+    {
+        serviceResponse.Message = "NotFound";
+        serviceResponse.Status = false;
+        serviceResponse.Data = null;
+        return Results.NotFound(serviceResponse);
+    }
+
+    serviceResponse.Message = "Ok";
+    serviceResponse.Data = policeEvents;
+
+    return Results.Ok(serviceResponse);
+});
+
 
 app.Run();
