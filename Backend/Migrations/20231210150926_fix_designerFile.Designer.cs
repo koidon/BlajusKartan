@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Backend.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20231208164800_AddedPoliceEvents")]
-    partial class AddedPoliceEvents
+    [Migration("20231210150926_fix_designerFile")]
+    partial class fix_designerFile
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -73,6 +73,9 @@ namespace Backend.Migrations
                                 .IsRequired()
                                 .HasColumnType("nvarchar(max)");
 
+                            b1.Property<int>("Id")
+                                .HasColumnType("int");
+
                             b1.Property<string>("Name")
                                 .IsRequired()
                                 .HasColumnType("nvarchar(max)");
@@ -119,11 +122,11 @@ namespace Backend.Migrations
                                         .HasForeignKey("PoliceEventEntityId");
                                 });
 
-                            b1.InfoPanel("Location")
+                            b1.Navigation("Location")
                                 .IsRequired();
                         });
 
-                    b.InfoPanel("PoliceEvent")
+                    b.Navigation("PoliceEvent")
                         .IsRequired();
                 });
 #pragma warning restore 612, 618

@@ -70,6 +70,9 @@ namespace Backend.Migrations
                                 .IsRequired()
                                 .HasColumnType("nvarchar(max)");
 
+                            b1.Property<int>("Id")
+                                .HasColumnType("int");
+
                             b1.Property<string>("Name")
                                 .IsRequired()
                                 .HasColumnType("nvarchar(max)");
@@ -116,11 +119,11 @@ namespace Backend.Migrations
                                         .HasForeignKey("PoliceEventEntityId");
                                 });
 
-                            b1.InfoPanel("Location")
+                            b1.Navigation("Location")
                                 .IsRequired();
                         });
 
-                    b.InfoPanel("PoliceEvent")
+                    b.Navigation("PoliceEvent")
                         .IsRequired();
                 });
 #pragma warning restore 612, 618
