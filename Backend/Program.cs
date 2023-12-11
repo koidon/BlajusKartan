@@ -195,5 +195,26 @@ app.MapGet("/getPoliceEventsByType/{type?}", async (string type, DataContext con
     return Results.Ok(serviceResponse);
 });
 
+app.MapGet("/getPoliceEventById/{id}", async (int id, DataContext context) =>
+{
+    var serviceResponse = new ServiceResponse<PoliceEventEntity>();
+
+    var policeEvent = await context.PoliceEvents
+        .FirstOrDefaultAsync(e => e.PoliceEvent.Id == id);
+
+    if (policeEvent == null)
+    {
+        serviceResponse.Message = "NotFound";
+        serviceResponse.Status = false;
+        serviceResponse.Data = null;
+        return Results.NotFound(serviceResponse);
+    }
+
+    serviceResponse.Message = "Ok";
+    serviceResponse.Data = policeEvent;
+
+    return Results.Ok(serviceResponse);
+});
+
 
 app.Run();
