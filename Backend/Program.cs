@@ -6,6 +6,8 @@ using Backend.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
+const string myAllowFrontend = "_myAllowFrontend";
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -14,8 +16,16 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<DataContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-
 builder.Services.AddHttpClient();
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(name: myAllowFrontend,
+        policy => policy.WithOrigins("http://localhost:5173")
+            .AllowAnyHeader()
+            .AllowAnyMethod());
+});
+
+
 
 //ServiceWorker for fetching new events continously
 builder.Services.AddHostedService<Worker>();
@@ -30,6 +40,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseCors(myAllowFrontend);
 
 app.MapPost("/createBook", (Book book, DataContext context) =>
 {

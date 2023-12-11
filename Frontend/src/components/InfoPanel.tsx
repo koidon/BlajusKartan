@@ -9,9 +9,12 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip.tsx";
 
+type Props = {
+  id: number;
+  name: string;
+};
 
-
-const InfoPanel = () => {
+const InfoPanel = ({ id, name }: Props) => {
   const isMobile = useMediaQuery("(max-width: 768px)");
 
   const isResizingRef = useRef(false);
@@ -105,6 +108,10 @@ const InfoPanel = () => {
           isMobile && "w-0",
         )}
       >
+        <div>
+          <p>{id}</p>
+          <p>{name}</p>
+        </div>
         <div
           onMouseDown={handleMouseDown}
           onClick={resetWidth}
