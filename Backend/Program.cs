@@ -20,15 +20,10 @@ builder.Services.AddHttpClient();
 builder.Services.AddCors(options =>
 {
     options.AddPolicy(name: myAllowFrontend,
-        policy => policy.WithOrigins("http://localhost:5173")
+        policy => policy.WithOrigins("http://localhost:5173", "https://brave-plant-021e67f03.4.azurestaticapps.net")
             .AllowAnyHeader()
             .AllowAnyMethod());
 });
-
-
-
-//ServiceWorker for fetching new events continously
-builder.Services.AddHostedService<Worker>();
 
 var app = builder.Build();
 
@@ -42,64 +37,6 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseCors(myAllowFrontend);
 
-app.MapPost("/postPoliceEvents", async ([FromServices] HttpClient httpClient, DataContext dataContext) =>
-{
-    var serviceResponse = new ServiceResponse<string>();
-
-    var policeApiUrl = "https://polisen.se/api/events";
-
-    var commentValue = new ProductInfoHeaderValue("(+https://blaljuskartan.se)");
-
-    httpClient.DefaultRequestHeaders.UserAgent.Add(commentValue);
-
-    try
-    {
-        var response = await httpClient.GetAsync(policeApiUrl);
-
-        response.EnsureSuccessStatusCode();
-
-        await using var responseStream = await response.Content.ReadAsStreamAsync();
-
-        var policeEvents = await JsonSerializer.DeserializeAsync<List<PoliceEvent>>(responseStream,
-            new JsonSerializerOptions
-            {
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-            });
-
-        if (policeEvents is not null)
-        {
-            foreach (var policeEvent in policeEvents)
-            {
-                // Check if the event already exists in the database
-                var existingEvent = dataContext.PoliceEvents.FirstOrDefault(e => e.PoliceEvent.Id == policeEvent.Id);
-
-                if (existingEvent is null)
-                {
-                    // Nytt event
-                    PoliceEventEntity policeEventEntity = new PoliceEventEntity
-                    {
-                        PoliceEvent = policeEvent
-                    };
-
-                    dataContext.PoliceEvents.Add(policeEventEntity);
-                    await dataContext.SaveChangesAsync();
-                }
-            }
-        }
-
-        serviceResponse.Status = true;
-        serviceResponse.Message = "Ok";
-        serviceResponse.Data = string.Empty;
-
-        return Results.Ok(serviceResponse);
-    }
-    catch (Exception ex)
-    {
-        serviceResponse.Status = false;
-        serviceResponse.Message = $"Error: {ex.Message}";
-        return Results.BadRequest("Oväntat fel från API");
-    }
-});
 
 app.MapGet("/getPoliceEvents/{datespan}", async (string datespan, DataContext context) =>
 {
