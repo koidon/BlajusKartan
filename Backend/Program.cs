@@ -1,9 +1,6 @@
-using System.Net.Http.Headers;
-using System.Text.Json;
 using Backend;
 using Backend.Data;
 using Backend.Models;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 const string myAllowFrontend = "_myAllowFrontend";
@@ -24,6 +21,8 @@ builder.Services.AddCors(options =>
             .AllowAnyHeader()
             .AllowAnyMethod());
 });
+
+builder.Services.AddHostedService<Worker>();
 
 var app = builder.Build();
 
