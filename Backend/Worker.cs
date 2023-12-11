@@ -105,14 +105,5 @@ public class Worker : BackgroundService
         {
             _logger.LogError(ex, "An unexpected error occurred when fetching events.");
         }
-
-    }
-
-    public override async Task StopAsync(CancellationToken stoppingToken)
-    {
-        _logger.LogInformation(
-            "Consume Scoped Service Hosted Service is stopping.");
-
-        await base.StopAsync(stoppingToken);
     }
 }
