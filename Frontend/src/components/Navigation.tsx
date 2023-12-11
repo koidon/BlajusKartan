@@ -16,7 +16,7 @@ const Navigation = () => {
       className={cn(
         "group/sidebar h-full bg-gray-50 overflow-y-auto flex w-20 shadow-xl ",
         isMobile
-          ? "w-full h-20 align-middle justify-center top-0"
+          ? "w-full h-13 align-middle justify-center top-0"
           : "flex-col relative z-[99999]",
       )}
     >
