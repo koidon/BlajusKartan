@@ -62,11 +62,11 @@ public class Worker : BackgroundService
 
                 await using var responseStream = await response.Content.ReadAsStreamAsync();
 
-                var policeEvents = await System.Text.Json.JsonSerializer.DeserializeAsync<List<PoliceEvent>>(
+                var policeEvents = await JsonSerializer.DeserializeAsync<List<PoliceEvent>>(
                     responseStream,
-                    new System.Text.Json.JsonSerializerOptions
+                    new JsonSerializerOptions
                     {
-                        PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase
+                        PropertyNamingPolicy = JsonNamingPolicy.CamelCase
                     });
 
                 if (policeEvents is not null)
