@@ -5,7 +5,6 @@ namespace Backend.Data;
 
 public class DataContext(DbContextOptions<DataContext> options) : DbContext(options)
 {
-    public DbSet<Book> Books => Set<Book>();
     public DbSet<PoliceEventEntity> PoliceEvents => Set<PoliceEventEntity>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

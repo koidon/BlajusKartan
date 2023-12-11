@@ -1,4 +1,5 @@
 ﻿using System.Net.Http.Headers;
+using System.Text.Json;
 using Backend.Data;
 using Backend.Models;
 
@@ -7,14 +8,14 @@ public class Worker : BackgroundService
 {
     private readonly ILogger<Worker> _logger;
     private readonly IServiceProvider _serviceProvider;
-    private readonly HttpClient _httpClient;
+    private readonly IHttpClientFactory _httpClientFactory;
 
     //Injecta dependencies
-    public Worker(ILogger<Worker> logger, IServiceProvider serviceProvider, HttpClient httpClient)
+    public Worker(ILogger<Worker> logger, IServiceProvider serviceProvider, IHttpClientFactory httpClientFactory)
     {
         _logger = logger;
         _serviceProvider = serviceProvider;
-        _httpClient = httpClient;
+        _httpClientFactory = httpClientFactory;
     }
 
     // Bakgrundtjänst
@@ -42,55 +43,76 @@ public class Worker : BackgroundService
     //API Metod
     private async Task FetchEventsAsync()
     {
-        using (var scope = _serviceProvider.CreateScope())
+        try
         {
-            var dataContext = scope.ServiceProvider.GetRequiredService<DataContext>();
-
-            var serviceResponse = new ServiceResponse<string>();
-
-            var policeApiUrl = "https://polisen.se/api/events";
-
-            //user-agent
-            var commentValue = new ProductInfoHeaderValue("(+https://blaljuskartan.se)");
-            _httpClient.DefaultRequestHeaders.UserAgent.Add(commentValue);
-
-            var response = await _httpClient.GetAsync(policeApiUrl);
-            response.EnsureSuccessStatusCode();
-
-            await using var responseStream = await response.Content.ReadAsStreamAsync();
-
-            var policeEvents = await System.Text.Json.JsonSerializer.DeserializeAsync<List<PoliceEvent>>(responseStream,
-                new System.Text.Json.JsonSerializerOptions
-                {
-                    PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase
-                });
-
-            if (policeEvents is not null)
+            using (var scope = _serviceProvider.CreateScope())
             {
-                foreach (var policeEvent in policeEvents)
-                {
-                    // Kontroll av ny händelse
-                    var existingEvent =
-                        dataContext.PoliceEvents.FirstOrDefault(e => e.PoliceEvent.Id == policeEvent.Id);
+                var dataContext = scope.ServiceProvider.GetRequiredService<DataContext>();
 
-                    if (existingEvent is null)
+                var policeApiUrl = "https://polisen.se/api/events";
+
+                var httpClient = _httpClientFactory.CreateClient();
+
+                //user-agent
+                var commentValue = new ProductInfoHeaderValue("(+https://blaljuskartan.se)", "1.0");
+                httpClient.DefaultRequestHeaders.UserAgent.Add(commentValue);
+
+                var response = await httpClient.GetAsync(policeApiUrl);
+                response.EnsureSuccessStatusCode();
+
+                await using var responseStream = await response.Content.ReadAsStreamAsync();
+
+                var policeEvents = await System.Text.Json.JsonSerializer.DeserializeAsync<List<PoliceEvent>>(
+                    responseStream,
+                    new System.Text.Json.JsonSerializerOptions
                     {
-                        PoliceEventEntity policeEventEntity = new PoliceEventEntity
-                        {
-                            PoliceEvent = policeEvent
-                        };
+                        PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase
+                    });
 
-                        dataContext.PoliceEvents.Add(policeEventEntity);
-                        await dataContext.SaveChangesAsync();
+                if (policeEvents is not null)
+                {
+                    foreach (var policeEvent in policeEvents)
+                    {
+                        // Kontroll av ny händelse
+                        var existingEvent =
+                            dataContext.PoliceEvents.FirstOrDefault(e => e.PoliceEvent.Id == policeEvent.Id);
+
+                        if (existingEvent is null)
+                        {
+                            PoliceEventEntity policeEventEntity = new PoliceEventEntity
+                            {
+                                PoliceEvent = policeEvent
+                            };
+
+                            dataContext.PoliceEvents.Add(policeEventEntity);
+                            await dataContext.SaveChangesAsync();
+                        }
                     }
                 }
+
+                _logger.LogInformation("Fetching and processing events completed.");
             }
-
-            serviceResponse.Status = true;
-            serviceResponse.Message = "Ok";
-            serviceResponse.Data = string.Empty;
-
-            _logger.LogInformation("Fetching and processing events completed.");
         }
+        catch (HttpRequestException httpEx)
+        {
+            _logger.LogError(httpEx, "HTTP request error when fetching events.");
+        }
+        catch (JsonException jsonEx)
+        {
+            _logger.LogError(jsonEx, "JSON deserialization error when fetching events.");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "An unexpected error occurred when fetching events.");
+        }
+
+    }
+
+    public override async Task StopAsync(CancellationToken stoppingToken)
+    {
+        _logger.LogInformation(
+            "Consume Scoped Service Hosted Service is stopping.");
+
+        await base.StopAsync(stoppingToken);
     }
 }

@@ -42,20 +42,6 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseCors(myAllowFrontend);
 
-app.MapPost("/createBook", (Book book, DataContext context) =>
-{
-    context.Books.Add(book);
-    context.SaveChanges();
-    return Results.Ok(book);
-});
-
-app.MapGet("/getBook{id}", (int id, DataContext context) =>
-{
-    var book = context.Books.FirstOrDefault(book => book.Id == id);
-
-    return book is null ? Results.NotFound() : Results.Ok(book);
-});
-
 app.MapPost("/postPoliceEvents", async ([FromServices] HttpClient httpClient, DataContext dataContext) =>
 {
     var serviceResponse = new ServiceResponse<string>();
@@ -137,7 +123,7 @@ app.MapGet("/getPoliceEvents/{datespan}", async (string datespan, DataContext co
     return Results.Ok(serviceResponse);
 });
 
-app.MapGet("/getPoliceEventsByType/{type?}", async (string type, DataContext context) =>
+app.MapGet("/getPoliceEventsByType/{type?}", async (string? type, DataContext context) =>
 {
     var serviceResponse = new ServiceResponse<List<PoliceEventEntity>>();
 
