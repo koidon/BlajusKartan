@@ -54,7 +54,7 @@ public class Worker : BackgroundService
                 var httpClient = _httpClientFactory.CreateClient();
 
                 //user-agent
-                var commentValue = new ProductInfoHeaderValue("(blaljuskartan.azurewebsites.net)", "1.0");
+                var commentValue = new ProductInfoHeaderValue("(+https://blaljuskartan.azurewebsites.net)");
                 httpClient.DefaultRequestHeaders.UserAgent.Add(commentValue);
 
                 var response = await httpClient.GetAsync(policeApiUrl);
