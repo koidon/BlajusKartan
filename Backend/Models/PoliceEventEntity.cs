@@ -1,8 +1,13 @@
-﻿namespace Backend.Models;
+﻿using Backend.Dtos;
+using Microsoft.EntityFrameworkCore;
 
+namespace Backend.Models;
+
+[Index(nameof(EventDate))]
 public class PoliceEventEntity
 {
     public int Id { get; set; }
-    public DateTime FetchedAt { get; set; } = DateTime.Now;
-    public required PoliceEvent PoliceEvent { get; set; }
+
+    public DateTimeOffset? EventDate { get; set; }
+    public required PoliceEventDto PoliceEvent { get; set; }
 }

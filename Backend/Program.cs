@@ -1,3 +1,4 @@
+using System.Globalization;
 using Backend;
 using Backend.Data;
 using Backend.Models;
@@ -17,11 +18,12 @@ builder.Services.AddHttpClient();
 builder.Services.AddCors(options =>
 {
     options.AddPolicy(name: myAllowFrontend,
-        policy => policy.WithOrigins("http://localhost:5173", "https://brave-plant-021e67f03.4.azurestaticapps.net")
+        policy => policy.WithOrigins("http://localhost:5173", "https://brave-plant-021e67f03.4.azurestaticapps.net:443")
             .AllowAnyHeader()
             .AllowAnyMethod());
 });
-
+builder.Services.AddSignalR();
+builder.Services.AddAutoMapper(typeof(Program).Assembly);
 builder.Services.AddHostedService<Worker>();
 
 var app = builder.Build();
@@ -35,29 +37,52 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseCors(myAllowFrontend);
+app.MapHub<EventHub>("/eventHub");
 
 
-app.MapGet("/getPoliceEvents/{datespan}", async (string datespan, DataContext context) =>
+app.MapGet("/getPoliceEvents/{date}", async (string date, DataContext context) =>
 {
     var serviceResponse = new ServiceResponse<List<PoliceEventEntity>>();
 
-    var policeEvents = await context.PoliceEvents
-        .Where(e => e.PoliceEvent.Datetime.Contains(datespan))
-        .ToListAsync();
-
-    if (policeEvents.Count == 0)
+    try
     {
-        serviceResponse.Message = "NotFound";
+        if (DateTimeOffset.TryParseExact(date, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal, out DateTimeOffset dateTimeOffset))
+        {
+            var startDate = dateTimeOffset.Date;
+            var endDate = startDate.AddDays(1);
+
+            var policeEvents = await context.PoliceEvents
+                .Where(e => e.EventDate >= startDate && e.EventDate < endDate)
+                .ToListAsync();
+
+            if (policeEvents.Count == 0)
+            {
+                serviceResponse.Message = "NotFound";
+                serviceResponse.Status = false;
+                serviceResponse.Data = null;
+                return Results.NotFound(serviceResponse);
+            }
+
+            serviceResponse.Message = "Ok";
+            serviceResponse.Data = policeEvents;
+
+            return Results.Ok(serviceResponse);
+        }
+
+        serviceResponse.Message = "Invalid date format";
         serviceResponse.Status = false;
         serviceResponse.Data = null;
-        return Results.NotFound(serviceResponse);
+        return Results.BadRequest(serviceResponse);
     }
-
-    serviceResponse.Message = "Ok";
-    serviceResponse.Data = policeEvents;
-
-    return Results.Ok(serviceResponse);
+    catch (Exception ex)
+    {
+        serviceResponse.Message = "Error: " + ex;
+        serviceResponse.Status = false;
+        serviceResponse.Data = null;
+        return Results.BadRequest(serviceResponse);
+    }
 });
+
 
 app.MapGet("/getPoliceEventsByType/{type?}", async (string? type, DataContext context) =>
 {

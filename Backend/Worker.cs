@@ -1,6 +1,8 @@
 ﻿using System.Net.Http.Headers;
 using System.Text.Json;
+using AutoMapper;
 using Backend.Data;
+using Backend.Dtos;
 using Backend.Models;
 
 namespace Backend;
@@ -9,13 +11,15 @@ public class Worker : BackgroundService
     private readonly ILogger<Worker> _logger;
     private readonly IServiceProvider _serviceProvider;
     private readonly IHttpClientFactory _httpClientFactory;
+    private readonly IMapper _mapper;
 
     //Injecta dependencies
-    public Worker(ILogger<Worker> logger, IServiceProvider serviceProvider, IHttpClientFactory httpClientFactory)
+    public Worker(ILogger<Worker> logger, IServiceProvider serviceProvider, IHttpClientFactory httpClientFactory, IMapper mapper)
     {
         _logger = logger;
         _serviceProvider = serviceProvider;
         _httpClientFactory = httpClientFactory;
+        _mapper = mapper;
     }
 
     // Bakgrundtjänst
@@ -54,7 +58,7 @@ public class Worker : BackgroundService
                 var httpClient = _httpClientFactory.CreateClient();
 
                 //user-agent
-                var commentValue = new ProductInfoHeaderValue("(+https://blaljuskartan.azurewebsites.net)");
+                var commentValue = new ProductInfoHeaderValue("(+https://blaljuskartan-api.azurewebsites.net)");
                 httpClient.DefaultRequestHeaders.UserAgent.Add(commentValue);
 
                 var response = await httpClient.GetAsync(policeApiUrl);
@@ -79,13 +83,26 @@ public class Worker : BackgroundService
 
                         if (existingEvent is null)
                         {
-                            PoliceEventEntity policeEventEntity = new PoliceEventEntity
+                            if (DateTimeOffset.TryParse(policeEvent.Datetime, out DateTimeOffset dateTimeOffset))
                             {
-                                PoliceEvent = policeEvent
-                            };
-
-                            dataContext.PoliceEvents.Add(policeEventEntity);
-                            await dataContext.SaveChangesAsync();
+                                PoliceEventEntity policeEventEntity = new PoliceEventEntity
+                                {
+                                    PoliceEvent = _mapper.Map<PoliceEventDto>(policeEvent),
+                                    EventDate = dateTimeOffset
+                                };
+                                dataContext.PoliceEvents.Add(policeEventEntity);
+                                await dataContext.SaveChangesAsync();
+                            }
+                            else
+                            {
+                                PoliceEventEntity policeEventEntity = new PoliceEventEntity
+                                {
+                                    PoliceEvent = _mapper.Map<PoliceEventDto>(policeEvent),
+                                    EventDate = null
+                                };
+                                dataContext.PoliceEvents.Add(policeEventEntity);
+                                await dataContext.SaveChangesAsync();
+                            }
                         }
                     }
                 }
