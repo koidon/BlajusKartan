@@ -1,18 +1,23 @@
 ﻿using Backend.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace Backend.Data;
-
-public class DataContext(DbContextOptions<DataContext> options) : DbContext(options)
+namespace Backend.Data
 {
-    public DbSet<PoliceEventEntity> PoliceEvents => Set<PoliceEventEntity>();
-
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    public class DataContext : DbContext
     {
-        modelBuilder.Entity<PoliceEventEntity>().OwnsOne(e => e.PoliceEvent, b =>
+        public DataContext(DbContextOptions<DataContext> options) : base(options)
         {
-            b.OwnsOne(e => e.Location);
-            b.ToJson();
-        });
+        }
+
+        public DbSet<PoliceEventEntity> PoliceEvents { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<PoliceEventEntity>(entity =>
+            {
+                entity.Property(eventDto => eventDto.PoliceEvent)
+                    .HasColumnType("json");
+            });
+        }
     }
 }

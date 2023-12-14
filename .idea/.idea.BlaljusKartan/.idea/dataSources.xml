@@ -9,5 +9,12 @@
       <jdbc-url>Server=tcp:sqldatabase-100.database.windows.net,1433;Initial Catalog=PoliceEvents;Persist Security Info=False;User ID=iser0035;Password=PetterTyr123!;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
+    <data-source source="LOCAL" name="svph2112_db2_ht2022@atlantis.informatik.umu.se" uuid="01238810-fa18-4488-aaa4-993bb504e4a1">
+      <driver-ref>mariadb</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>org.mariadb.jdbc.Driver</jdbc-driver>
+      <jdbc-url>jdbc:mariadb://atlantis.informatik.umu.se:3306/svph2112_db2_ht2022</jdbc-url>
+      <working-dir>$ProjectFileDir$</working-dir>
+    </data-source>
   </component>
 </project>
