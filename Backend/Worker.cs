@@ -4,6 +4,7 @@ using AutoMapper;
 using Backend.Data;
 using Backend.Dtos;
 using Backend.Models;
+using Microsoft.AspNetCore.SignalR;
 
 namespace Backend;
 public class Worker : BackgroundService
@@ -12,14 +13,16 @@ public class Worker : BackgroundService
     private readonly IServiceProvider _serviceProvider;
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly IMapper _mapper;
+    private readonly IHubContext<EventHub> _hubContext;
 
     //Injecta dependencies
-    public Worker(ILogger<Worker> logger, IServiceProvider serviceProvider, IHttpClientFactory httpClientFactory, IMapper mapper)
+    public Worker(ILogger<Worker> logger, IServiceProvider serviceProvider, IHttpClientFactory httpClientFactory, IMapper mapper, IHubContext<EventHub> hubContext)
     {
         _logger = logger;
         _serviceProvider = serviceProvider;
         _httpClientFactory = httpClientFactory;
         _mapper = mapper;
+        _hubContext = hubContext;
     }
 
     // Bakgrundtjänst
@@ -73,8 +76,11 @@ public class Worker : BackgroundService
                         PropertyNamingPolicy = JsonNamingPolicy.CamelCase
                     });
 
-                if (policeEvents is not null)
+                if (policeEvents is not null && policeEvents.Any())
                 {
+
+                    var newEvents = new List<PoliceEventEntity>();
+
                     foreach (var policeEvent in policeEvents)
                     {
                         // Kontroll av ny händelse
@@ -90,8 +96,9 @@ public class Worker : BackgroundService
                                     PoliceEvent = _mapper.Map<PoliceEventDto>(policeEvent),
                                     EventDate = dateTimeOffset
                                 };
-                                dataContext.PoliceEvents.Add(policeEventEntity);
-                                await dataContext.SaveChangesAsync();
+
+                                newEvents.Add(policeEventEntity);
+
                             }
                             else
                             {
@@ -100,11 +107,15 @@ public class Worker : BackgroundService
                                     PoliceEvent = _mapper.Map<PoliceEventDto>(policeEvent),
                                     EventDate = null
                                 };
-                                dataContext.PoliceEvents.Add(policeEventEntity);
-                                await dataContext.SaveChangesAsync();
+                                newEvents.Add(policeEventEntity);
                             }
                         }
                     }
+                    dataContext.PoliceEvents.AddRange(newEvents);
+                    await dataContext.SaveChangesAsync();
+
+                    await _hubContext.Clients.All.SendAsync("ReceiveEvents", newEvents);
+
                 }
 
                 _logger.LogInformation("Fetching and processing events completed.");

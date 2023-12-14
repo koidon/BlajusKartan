@@ -6,13 +6,12 @@ export type EventResponse = {
 
 export type EventEntity = {
   id: number;
-  fetchedAt: string;
+  EventDate: string;
   policeEvent: PoliceEvent;
 };
 
 export type PoliceEvent = {
   id: number;
-  datetime: string;
   name: string;
   summary: string;
   url: string;
@@ -23,17 +22,4 @@ export type PoliceEvent = {
 export type Location = {
   name: string;
   gps: string;
-};
-
-export type GeoJsonObject = {
-  type: string;
-  properties: {
-    name: string;
-    amenity: string;
-    popupContent: string;
-  };
-  geometry: {
-    type: string;
-    coordinates: number[];
-  };
 };

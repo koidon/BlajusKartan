@@ -10,17 +10,21 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+var serverVersion = new MySqlServerVersion(new Version(10, 6, 12));
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddDbContext<DataContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+builder.Services.AddDbContext<DataContext>(optionsBuilder =>
+    optionsBuilder.UseMySql(connectionString, serverVersion, options => options.UseMicrosoftJson()));
 builder.Services.AddHttpClient();
 builder.Services.AddCors(options =>
 {
     options.AddPolicy(name: myAllowFrontend,
         policy => policy.WithOrigins("http://localhost:5173", "https://brave-plant-021e67f03.4.azurestaticapps.net:443")
             .AllowAnyHeader()
-            .AllowAnyMethod());
+            .AllowAnyMethod()
+            .AllowCredentials());
 });
 builder.Services.AddSignalR();
 builder.Services.AddAutoMapper(typeof(Program).Assembly);
@@ -54,14 +58,6 @@ app.MapGet("/getPoliceEvents/{date}", async (string date, DataContext context) =
             var policeEvents = await context.PoliceEvents
                 .Where(e => e.EventDate >= startDate && e.EventDate < endDate)
                 .ToListAsync();
-
-            if (policeEvents.Count == 0)
-            {
-                serviceResponse.Message = "NotFound";
-                serviceResponse.Status = false;
-                serviceResponse.Data = null;
-                return Results.NotFound(serviceResponse);
-            }
 
             serviceResponse.Message = "Ok";
             serviceResponse.Data = policeEvents;

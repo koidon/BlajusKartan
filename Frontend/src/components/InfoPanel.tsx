@@ -8,13 +8,16 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip.tsx";
+import Latest from "@/components/infoPanelComponents/Latest.tsx";
+import { GeojsonFeatures } from "@/routes";
 
 type Props = {
   id: number;
   name: string;
+  geoJsonFeatures: GeojsonFeatures;
 };
 
-const InfoPanel = ({ id, name }: Props) => {
+const InfoPanel = ({ id, name, geoJsonFeatures }: Props) => {
   const isMobile = useMediaQuery("(max-width: 768px)");
 
   const isResizingRef = useRef(false);
@@ -112,6 +115,8 @@ const InfoPanel = ({ id, name }: Props) => {
           <p>{id}</p>
           <p>{name}</p>
         </div>
+        <br />
+        <Latest geoJsonFeatures={geoJsonFeatures} />
         <div
           onMouseDown={handleMouseDown}
           onClick={resetWidth}

@@ -3,14 +3,41 @@ import { Card, CardHeader } from "@/components/ui/card.tsx";
 import { Minus } from "lucide-react";
 import { Drawer } from "vaul";
 import { useState } from "react";
+import { GeojsonFeatures } from "@/routes";
 
-const Latest = () => {
+type Props = {
+  geoJsonFeatures: GeojsonFeatures;
+};
+
+const Latest = ({ geoJsonFeatures }: Props) => {
   const isMobile = useMediaQuery("(max-width: 768px)");
   const [hide, setHide] = useState(false);
+  //const [events, setEvents] = useState<EventEntity[]>([]);
+
+  /*useEffect(() => {
+    // Start SignalR connection when the component mounts
+    const connection = new signalR.HubConnectionBuilder()
+      .withUrl("http://localhost:5118/eventHub")
+      .configureLogging(signalR.LogLevel.Information)
+      .build();
+
+    // Listen for real-time events
+    connection.start().then(() => {
+      connection.on("ReceiveEvents", (events) => {
+        // Update state with the new events
+        setEvents(events);
+      });
+    });
+
+    // Clean up SignalR connection when the component unmounts
+    return () => {
+      connection.stop();
+    };
+  }, []);*/
 
   return (
     <>
-      {isMobile && (
+      {isMobile ? (
         <Drawer.Root onClose={() => setHide(false)}>
           <Drawer.Trigger asChild onClick={() => setHide(true)}>
             {!hide && (
@@ -29,30 +56,13 @@ const Latest = () => {
                 <div className="mx-auto w-12 h-1.5 flex-shrink-0 rounded-full bg-zinc-300 mb-8" />
                 <div className="max-w-md mx-auto">
                   <Drawer.Title className="font-medium mb-4">
-                    Unstyled drawer for React.
+                    Senaste events
                   </Drawer.Title>
-                  <p className="text-zinc-600 mb-2">
-                    This component can be used as a replacement for a Dialog on
-                    mobile and tablet devices.
-                  </p>
-                  <p className="text-zinc-600 mb-8">
-                    It uses{" "}
-                    <a
-                      href="https://www.radix-ui.com/docs/primitives/components/dialog"
-                      className="underline"
-                      target="_blank"
-                    >
-                      Radix&rsquo;s Dialog primitive
-                    </a>{" "}
-                    under the hood and is inspired by{" "}
-                    <a
-                      href="https://twitter.com/devongovett/status/1674470185783402496"
-                      className="underline"
-                      target="_blank"
-                    >
-                      this tweet.
-                    </a>
-                  </p>
+                  {geoJsonFeatures.features.map((feature) => {
+                    return (
+                      <div key={feature.id}>{feature.properties.name}</div>
+                    );
+                  })}
                 </div>
               </div>
               <div className="p-4 bg-zinc-100 border-t border-zinc-200 mt-auto">
@@ -102,6 +112,16 @@ const Latest = () => {
             </Drawer.Content>
           </Drawer.Portal>
         </Drawer.Root>
+      ) : (
+        <div className="overflow-scroll h-1/4">
+          <h1>Senaste nytt</h1>
+          {geoJsonFeatures.features.map((feature) => {
+            return <div key={feature.id}>{feature.properties.name}</div>;
+          })}
+          {/*events.map((events) => {
+            return <div key={events.id}>{events.policeEvent.name}</div>;
+          })*/}
+        </div>
       )}
     </>
   );
