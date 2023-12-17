@@ -35,7 +35,9 @@ public class Worker : BackgroundService
                 _logger.LogInformation("Worker running at: {time}", DateTimeOffset.Now);
 
                 // Fetch and process events from the API
-                await FetchEventsAsync();
+                var newEvents = await FetchEventsAsync();
+
+                await _hubContext.Clients.All.SendAsync("ReceiveEvents", newEvents, cancellationToken: stoppingToken);
 
                 // Delay for a specific interval (e.g., 1 hour)
                 await Task.Delay(TimeSpan.FromMinutes(5), stoppingToken);
@@ -48,8 +50,10 @@ public class Worker : BackgroundService
     }
 
     //API Metod
-    private async Task FetchEventsAsync()
+    private async Task<List<PoliceEventEntity>>  FetchEventsAsync()
     {
+        var newEvents = new List<PoliceEventEntity>();
+
         try
         {
             using (var scope = _serviceProvider.CreateScope())
@@ -78,8 +82,6 @@ public class Worker : BackgroundService
 
                 if (policeEvents is not null && policeEvents.Any())
                 {
-
-                    var newEvents = new List<PoliceEventEntity>();
 
                     foreach (var policeEvent in policeEvents)
                     {
@@ -114,8 +116,6 @@ public class Worker : BackgroundService
                     dataContext.PoliceEvents.AddRange(newEvents);
                     await dataContext.SaveChangesAsync();
 
-                    await _hubContext.Clients.All.SendAsync("ReceiveEvents", newEvents);
-
                 }
 
                 _logger.LogInformation("Fetching and processing events completed.");
@@ -133,5 +133,7 @@ public class Worker : BackgroundService
         {
             _logger.LogError(ex, "An unexpected error occurred when fetching events.");
         }
+
+        return newEvents;
     }
 }

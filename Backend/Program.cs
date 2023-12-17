@@ -21,7 +21,7 @@ builder.Services.AddHttpClient();
 builder.Services.AddCors(options =>
 {
     options.AddPolicy(name: myAllowFrontend,
-        policy => policy.WithOrigins("http://localhost:5173", "https://brave-plant-021e67f03.4.azurestaticapps.net:443")
+        policy => policy.WithOrigins("http://localhost:5173", "https://brave-plant-021e67f03.4.azurestaticapps.net")
             .AllowAnyHeader()
             .AllowAnyMethod()
             .AllowCredentials());
@@ -39,8 +39,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
 app.UseCors(myAllowFrontend);
+app.UseHttpsRedirection();
 app.MapHub<EventHub>("/eventHub");
 
 
