@@ -9,15 +9,14 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip.tsx";
 import Latest from "@/components/infoPanelComponents/Latest.tsx";
-import { GeojsonFeatures } from "@/routes";
+import { EventResponse } from "@/Models/policeEvent.ts";
+import { useCurrentEvent } from "@/Context/useCurrentEvent.ts";
 
 type Props = {
-  id: number;
-  name: string;
-  geoJsonFeatures: GeojsonFeatures;
+  events: EventResponse | undefined;
 };
 
-const InfoPanel = ({ id, name, geoJsonFeatures }: Props) => {
+const InfoPanel = ({ events }: Props) => {
   const isMobile = useMediaQuery("(max-width: 768px)");
 
   const isResizingRef = useRef(false);
@@ -25,6 +24,7 @@ const InfoPanel = ({ id, name, geoJsonFeatures }: Props) => {
   const navbarRef = useRef<ElementRef<"div">>(null);
   const [isResetting, setIsResetting] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(isMobile);
+  const {currentEvent} = useCurrentEvent();
 
   useEffect(() => {
     if (isMobile) {
@@ -112,11 +112,11 @@ const InfoPanel = ({ id, name, geoJsonFeatures }: Props) => {
         )}
       >
         <div>
-          <p>{id}</p>
-          <p>{name}</p>
+          <p>{currentEvent.id}</p>
+          <p>{currentEvent.name}</p>
         </div>
         <br />
-        <Latest geoJsonFeatures={geoJsonFeatures} />
+        <Latest events={events} />
         <div
           onMouseDown={handleMouseDown}
           onClick={resetWidth}

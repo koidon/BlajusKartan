@@ -3,7 +3,7 @@ import { EventEntity } from "@/Models/policeEvent.ts";
 
 type ReceiveEventsCallback = (events: EventEntity[]) => void;
 
-const hubUrl = "wss://localhost:5118/eventhub";
+const hubUrl = "https://blaljuskartan-api.azurewebsites.net/eventHub";
 
 const connection = new signalR.HubConnectionBuilder()
   .withUrl(hubUrl)

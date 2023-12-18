@@ -3,15 +3,19 @@ import { Card, CardHeader } from "@/components/ui/card.tsx";
 import { Minus } from "lucide-react";
 import { Drawer } from "vaul";
 import { useState } from "react";
-import { GeojsonFeatures } from "@/routes";
+import { EventResponse } from "@/Models/policeEvent.ts";
+import { ScrollArea } from "@/components/ui/scroll-area.tsx";
+import { Separator } from "@/components/ui/separator.tsx";
+import { useCurrentEvent } from "@/Context/useCurrentEvent.ts";
 
 type Props = {
-  geoJsonFeatures: GeojsonFeatures;
+  events: EventResponse | undefined;
 };
 
-const Latest = ({ geoJsonFeatures }: Props) => {
+const Latest = ({ events }: Props) => {
   const isMobile = useMediaQuery("(max-width: 768px)");
   const [hide, setHide] = useState(false);
+  const {setCurrentEvent} = useCurrentEvent();
   //const [events, setEvents] = useState<EventEntity[]>([]);
 
   /*useEffect(() => {
@@ -58,69 +62,29 @@ const Latest = ({ geoJsonFeatures }: Props) => {
                   <Drawer.Title className="font-medium mb-4">
                     Senaste events
                   </Drawer.Title>
-                  {geoJsonFeatures.features.map((feature) => {
-                    return (
-                      <div key={feature.id}>{feature.properties.name}</div>
-                    );
-                  })}
-                </div>
-              </div>
-              <div className="p-4 bg-zinc-100 border-t border-zinc-200 mt-auto">
-                <div className="flex gap-6 justify-end max-w-md mx-auto">
-                  <a
-                    className="text-xs text-zinc-600 flex items-center gap-0.25"
-                    href="https://github.com/emilkowalski/vaul"
-                    target="_blank"
-                  >
-                    GitHub
-                    <svg
-                      fill="none"
-                      height="16"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                      width="16"
-                      aria-hidden="true"
-                      className="w-3 h-3 ml-1"
-                    >
-                      <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"></path>
-                      <path d="M15 3h6v6"></path>
-                      <path d="M10 14L21 3"></path>
-                    </svg>
-                  </a>
-                  <a
-                    className="text-xs text-zinc-600 flex items-center gap-0.25"
-                    href="https://twitter.com/emilkowalski_"
-                    target="_blank"
-                  >
-                    Twitter
-                    <svg
-                      fill="none"
-                      height="16"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                      width="16"
-                      aria-hidden="true"
-                      className="w-3 h-3 ml-1"
-                    >
-                      <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"></path>
-                      <path d="M15 3h6v6"></path>
-                      <path d="M10 14L21 3"></path>
-                    </svg>
-                  </a>
+                  <ScrollArea className="h-72 rounded-md border">
+                    {events?.data.map((eventEntity) => {
+                      return (
+                        <div className="hover:shadow-md" onClick={() => setCurrentEvent({id: eventEntity.id, name: eventEntity.policeEvent.name})} key={eventEntity.id}>{eventEntity.policeEvent.name}</div>
+                      );
+                    })}
+                  </ScrollArea>
                 </div>
               </div>
             </Drawer.Content>
           </Drawer.Portal>
         </Drawer.Root>
       ) : (
-        <div className="overflow-scroll h-1/4">
-          <h1>Senaste nytt</h1>
-          {geoJsonFeatures.features.map((feature) => {
-            return <div key={feature.id}>{feature.properties.name}</div>;
-          })}
-          {/*events.map((events) => {
-            return <div key={events.id}>{events.policeEvent.name}</div>;
-          })*/}
+        <div className="mt-auto">
+        <h3 className="mb-4 text-md font-medium leading-none">Senaste nytt</h3>
+        <ScrollArea className="h-72 rounded-md border">
+          {events?.data.map((eventEntity) =>
+            <div key={eventEntity.id} className="hover:shadow-md">
+            <div  onClick={() => setCurrentEvent({id: eventEntity.id, name: eventEntity.policeEvent.name})}>{eventEntity.policeEvent.name}</div>
+              <Separator className="my-2" />
+            </div>
+          )}
+        </ScrollArea>
         </div>
       )}
     </>
