@@ -7,7 +7,16 @@ import EventMap from "@/components/EventMap.tsx";
 import { useEffect } from "react";
 import useEventSubscription from "@/Hooks/policeEvent/useEventSubscription.tsx";
 
+type eventFilter = {
+  id: number
+}
+
 export const Route = new FileRoute("/").createRoute({
+  validateSearch: (search: Record<string, unknown>): eventFilter => {
+    return {
+      id: Number(search?.id)
+    }
+  },
   component: IndexComponent
 });
 
@@ -31,7 +40,7 @@ function IndexComponent() {
   }
 
   return (
-     <EventMap eventResponse={eventResponse}/>
+     <EventMap eventResponse={eventResponse} datespan={datespan}/>
   );
 }
 

@@ -10,13 +10,15 @@ import {
 } from "@/components/ui/tooltip.tsx";
 import Latest from "@/components/infoPanelComponents/Latest.tsx";
 import { EventResponse } from "@/Models/policeEvent.ts";
-import { useCurrentEvent } from "@/Context/useCurrentEvent.ts";
+import { Separator } from "@/components/ui/separator.tsx";
+import useGetEventById from "@/Hooks/policeEvent/useGetEventById.tsx";
 
 type Props = {
   events: EventResponse | undefined;
+  datespan: string
 };
 
-const InfoPanel = ({ events }: Props) => {
+const InfoPanel = ({ events, datespan }: Props) => {
   const isMobile = useMediaQuery("(max-width: 768px)");
 
   const isResizingRef = useRef(false);
@@ -24,7 +26,8 @@ const InfoPanel = ({ events }: Props) => {
   const navbarRef = useRef<ElementRef<"div">>(null);
   const [isResetting, setIsResetting] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(isMobile);
-  const {currentEvent} = useCurrentEvent();
+  //const {currentEvent} = useCurrentEvent();
+  const {data: event} = useGetEventById(datespan);
 
   useEffect(() => {
     if (isMobile) {
@@ -111,9 +114,18 @@ const InfoPanel = ({ events }: Props) => {
           isMobile && "w-0",
         )}
       >
-        <div>
-          <p>{currentEvent.id}</p>
-          <p>{currentEvent.name}</p>
+        <div className="mt-2">
+          <h3 className="mb-4 text-md font-medium leading-none">{event?.policeEvent?.name.split(",")[1].trim() + " i " + event?.policeEvent?.location.name}</h3>
+          <Separator/>
+          <div>
+            <p>inträffat: {event?.EventDate}</p>
+            <p>Publicerades: {event?.policeEvent.name.split(",")[0].trim()}</p>
+          </div>
+          <Separator/>
+          <a href={`https://polisen.se/${event?.policeEvent.url}`} className="text-blue-500"><p>Se händelse på polisens hemsida</p></a>
+          <Separator/>
+          <p>{event?.policeEvent.summary}</p>
+
         </div>
         <br />
         <Latest events={events} />

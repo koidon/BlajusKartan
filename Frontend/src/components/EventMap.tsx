@@ -8,9 +8,12 @@ import Navigation from "@/components/Navigation.tsx";
 import { useMediaQuery } from "usehooks-ts";
 import InfoPanel from "@/components/InfoPanel.tsx";
 import { iconMapping, warningIcon } from "@/Models/eventIcons.ts";
-import { useCurrentEvent } from "@/Context/useCurrentEvent.ts";
+import { useNavigate } from "@tanstack/react-router";
+import { Route as IndexRoute } from "@/routes";
+import useGetEventById from "@/Hooks/policeEvent/useGetEventById.tsx";
 type Props = {
   eventResponse: EventResponse | undefined;
+  datespan: string
 }
 
 export type GeojsonFeatures = {
@@ -19,8 +22,6 @@ export type GeojsonFeatures = {
     type: string;
     id: number;
     properties: {
-      name: string;
-      date: string;
       type: string;
     };
     geometry: {
@@ -30,30 +31,21 @@ export type GeojsonFeatures = {
   }>;
 };
 
-type CurrentFeature = {
-  id: number;
-  name: string;
-};
-
 const convertCoordinates = ((input: string): number[] => {
   const [latitude, longitude] = input.split(",").map(parseFloat);
   return [longitude, latitude];
 })
 
-const EventMap = ({eventResponse}: Props) => {
+const EventMap = ({eventResponse, datespan}: Props) => {
+  const navigate = useNavigate({ from: IndexRoute.id})
   const isMobile = useMediaQuery("(max-width: 768px)");
   const position = { lat: 63.1282, lng: 18.6435 };
-  /*const [currentEvent, setCurrentEvent] = useState({
-    id: 0,
-    name: ""
-  });*/
-  const {currentEvent, setCurrentEvent} = useCurrentEvent();
   const [geoJsonFeatures, setGeoJsonFeatures] = useState<GeojsonFeatures>({
     type: "FeatureCollection",
     features: []
   });
   const [isMapClicked, setIsMapClicked] = useState(false);
-
+  const {data: event} = useGetEventById(datespan);
   const dialogTriggerRef = useRef<ElementRef<"button">>(null);
 
   useEffect(() => {
@@ -62,9 +54,7 @@ const EventMap = ({eventResponse}: Props) => {
         type: "Feature",
         id: eventEntity.id,
         properties: {
-          name: eventEntity.policeEvent.name,
           type: eventEntity.policeEvent.type,
-          date: eventEntity.EventDate
         },
         geometry: {
           type: "Point",
@@ -85,11 +75,13 @@ const EventMap = ({eventResponse}: Props) => {
     setIsMapClicked((prev) => !prev);
   };
 
-  const handleMarkerClick = ({ id, name }: CurrentFeature) => {
+  const handleMarkerClick = (id: number) => {
     if (dialogTriggerRef.current && isMobile) {
       dialogTriggerRef.current.click();
     }
-    setCurrentEvent({ id: id, name: name });
+    navigate({
+      search: () => ({ id: id})
+    }).then()
   };
 
 
@@ -98,6 +90,7 @@ const EventMap = ({eventResponse}: Props) => {
     {!isMobile ? (
     <InfoPanel
       events={eventResponse}
+      datespan={datespan}
     />
   ) : <><div
       className={cn(
@@ -139,17 +132,14 @@ const EventMap = ({eventResponse}: Props) => {
                 ]}
                 eventHandlers={{
                   click: () =>
-                    handleMarkerClick({
-                      id: feature.id,
-                      name: feature.properties.name
-                    })
+                    handleMarkerClick(feature.id)
                 }}
                 icon={selectedIcon}
               >
                 <Dialog>
                   <DialogTrigger ref={dialogTriggerRef}></DialogTrigger>
                   <DialogContent>
-                    <DialogHeader>{currentEvent.name}</DialogHeader>
+                    <DialogHeader>{event?.policeEvent.name}</DialogHeader>
                     <DialogDescription></DialogDescription>
                   </DialogContent>
                 </Dialog>

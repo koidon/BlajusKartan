@@ -6,7 +6,8 @@ import { useState } from "react";
 import { EventResponse } from "@/Models/policeEvent.ts";
 import { ScrollArea } from "@/components/ui/scroll-area.tsx";
 import { Separator } from "@/components/ui/separator.tsx";
-import { useCurrentEvent } from "@/Context/useCurrentEvent.ts";
+import { Link, useNavigate } from "@tanstack/react-router";
+import { Route as IndexRoute} from "@/routes/index.tsx"
 
 type Props = {
   events: EventResponse | undefined;
@@ -15,29 +16,7 @@ type Props = {
 const Latest = ({ events }: Props) => {
   const isMobile = useMediaQuery("(max-width: 768px)");
   const [hide, setHide] = useState(false);
-  const {setCurrentEvent} = useCurrentEvent();
-  //const [events, setEvents] = useState<EventEntity[]>([]);
-
-  /*useEffect(() => {
-    // Start SignalR connection when the component mounts
-    const connection = new signalR.HubConnectionBuilder()
-      .withUrl("http://localhost:5118/eventHub")
-      .configureLogging(signalR.LogLevel.Information)
-      .build();
-
-    // Listen for real-time events
-    connection.start().then(() => {
-      connection.on("ReceiveEvents", (events) => {
-        // Update state with the new events
-        setEvents(events);
-      });
-    });
-
-    // Clean up SignalR connection when the component unmounts
-    return () => {
-      connection.stop();
-    };
-  }, []);*/
+  const navigate = useNavigate({ from: IndexRoute.id})
 
   return (
     <>
@@ -65,7 +44,11 @@ const Latest = ({ events }: Props) => {
                   <ScrollArea className="h-72 rounded-md border">
                     {events?.data.map((eventEntity) => {
                       return (
-                        <div className="hover:shadow-md" onClick={() => setCurrentEvent({id: eventEntity.id, name: eventEntity.policeEvent.name})} key={eventEntity.id}>{eventEntity.policeEvent.name}</div>
+                        <div className="hover:shadow-md" onClick={() => {
+                          navigate({
+                            search: () => ({ id: eventEntity.id})
+                          }).then()
+                        }}>{eventEntity.policeEvent.name}</div>
                       );
                     })}
                   </ScrollArea>
@@ -80,11 +63,18 @@ const Latest = ({ events }: Props) => {
         <ScrollArea className="h-72 rounded-md border">
           {events?.data.map((eventEntity) =>
             <div key={eventEntity.id} className="hover:shadow-md">
-            <div  onClick={() => setCurrentEvent({id: eventEntity.id, name: eventEntity.policeEvent.name})}>{eventEntity.policeEvent.name}</div>
+            <div  onClick={() => {
+              navigate({
+                search: () => ({ id: eventEntity.id})
+              }).then()
+            }}>{eventEntity.policeEvent.name}</div>
               <Separator className="my-2" />
             </div>
           )}
         </ScrollArea>
+          <Link from={IndexRoute.id} search={{
+            id: 3
+          }}>Test</Link>
         </div>
       )}
     </>

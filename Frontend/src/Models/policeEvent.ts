@@ -23,3 +23,11 @@ export type Location = {
   name: string;
   gps: string;
 };
+
+export type EventIdResponse = {
+  data: EventEntity;
+  message: string;
+  status: boolean;
+};
+
+

@@ -3,10 +3,13 @@ import { Route as AboutRoute } from "./routes/about"
 import { Route as IndexRoute } from "./routes/index"
 import { Route as HistoryRoute } from "./routes/history"
 
+
+
 declare module "@tanstack/react-router" {
     interface FileRoutesByPath {
         "/": {
             parentRoute: typeof rootRoute
+
         }
         "/history": {
             parentRoute: typeof rootRoute

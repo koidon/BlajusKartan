@@ -5,6 +5,7 @@ import { useMediaQuery } from "usehooks-ts";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
 export const Route = new RootRoute({
+
   component: RootComponent,
 });
 

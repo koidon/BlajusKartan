@@ -24,7 +24,6 @@ const UseEventSubscription = (datespan: string) => {
         console.log("SignalR Connected.")
         connection.on("ReceiveEvents", (newEvents) => {
          if (newEvents.length !== 0) {
-           console.log("received events", newEvents);
            queryClient.setQueryData([`getPoliceEvents/${datespan}`], (oldData: EventResponse | undefined) => {
              if (oldData) {
                const updatedData: EventResponse = {
