@@ -8,7 +8,7 @@ import { useEffect } from "react";
 import useEventSubscription from "@/Hooks/policeEvent/useEventSubscription.tsx";
 
 type eventFilter = {
-  id: number
+  id: number;
 }
 
 export const Route = new FileRoute("/").createRoute({
