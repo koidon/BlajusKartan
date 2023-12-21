@@ -6,7 +6,7 @@ import { useState } from "react";
 import { EventResponse } from "@/Models/policeEvent.ts";
 import { ScrollArea } from "@/components/ui/scroll-area.tsx";
 import { Separator } from "@/components/ui/separator.tsx";
-import { Link, useNavigate } from "@tanstack/react-router";
+import { useNavigate } from "@tanstack/react-router";
 import { Route as IndexRoute} from "@/routes/index.tsx"
 
 type Props = {
@@ -44,7 +44,7 @@ const Latest = ({ events }: Props) => {
                   <ScrollArea className="h-72 rounded-md border">
                     {events?.data.map((eventEntity) => {
                       return (
-                        <div className="hover:shadow-md" onClick={() => {
+                        <div key={eventEntity.id} className="hover:shadow-md" onClick={() => {
                           navigate({
                             search: () => ({ id: eventEntity.id})
                           }).then()
@@ -72,9 +72,6 @@ const Latest = ({ events }: Props) => {
             </div>
           )}
         </ScrollArea>
-          <Link from={IndexRoute.id} search={{
-            id: 3
-          }}>Test</Link>
         </div>
       )}
     </>
