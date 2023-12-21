@@ -1,7 +1,7 @@
 import { FeatureGroup, MapContainer, Marker, TileLayer } from "react-leaflet";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTrigger } from "@/components/ui/dialog.tsx";
 import { ElementRef, useEffect, useRef, useState } from "react";
-import {  EventResponse } from "@/Models/policeEvent.ts";
+import {EventResponse} from "@/Models/policeEvent.ts";
 import { cn } from "@/lib/utils.ts";
 import Latest from "@/components/infoPanelComponents/Latest.tsx";
 import Navigation from "@/components/Navigation.tsx";
@@ -84,6 +84,31 @@ const EventMap = ({eventResponse, datespan}: Props) => {
     }).then()
   };
 
+/*  const EventMap = () => {
+    const [showCurrentEvent, setShowCurrentEvent] = useState(false);
+    const [selectedEvent, setSelectedEvent] = useState<EventEntity | undefined>(/!* Initial value *!/);
+    
+    const handleMarkerClick = (eventEntity: EventEntity) => {
+      setSelectedEvent(eventEntity);
+      setShowCurrentEvent(true);
+    };
+
+    const handleCloseCurrentEvent = () => {
+      setShowCurrentEvent(false);
+      setSelectedEvent(undefined);
+    };*/
+
+/*    return (
+        <>
+          {showCurrentEvent && (
+              <div className="fixed inset-0 flex items-center justify-center">
+                <CurrentEvent event={selectedEvent} />
+                <button onClick={handleCloseCurrentEvent}>Close</button>
+              </div>
+          )}
+        </>
+    );
+  };*/
 
   return (
     <>

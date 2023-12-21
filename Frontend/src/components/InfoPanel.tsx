@@ -114,38 +114,40 @@ const InfoPanel = ({ events, datespan }: Props) => {
           isMobile && "w-0",
         )}
       >
-        <div className="mt-2">
-          <h3 className="mb-4 text-md font-medium leading-none">{event?.policeEvent?.name.split(",")[1].trim() + " i " + event?.policeEvent?.location.name}</h3>
-          <Separator/>
-          <div>
-            <p>inträffat: {event?.EventDate}</p>
-            <p>Publicerades: {event?.policeEvent.name.split(",")[0].trim()}</p>
+        <div className="mt-2 border border-blue-500 p-4 rounded shadow-md">
+          <h3 className="mb-4 text-lg font-semibold">{event?.policeEvent?.name.split(",")[1].trim() + " i " + event?.policeEvent?.location.name}</h3>
+          <Separator className="my-3"/>
+          <div className="mb-3">
+            <p className="text-gray-800">Inträffat: {event?.EventDate}</p>
+            <p className="text-gray-800">Publicerades: {event?.policeEvent.name.split(",")[0].trim()}</p>
           </div>
-          <Separator/>
-          <a href={`https://polisen.se/${event?.policeEvent.url}`} className="text-blue-500"><p>Se händelse på polisens hemsida</p></a>
-          <Separator/>
-          <p>{event?.policeEvent.summary}</p>
-
+          <Separator className="my-3"/>
+          <a href={`https://polisen.se/${event?.policeEvent.url}`} className="text-blue-500 hover:underline block mb-3">
+            Se händelse på polisens hemsida
+          </a>
+          <Separator className="my-3"/>
+          <p className="text-gray-700">{event?.policeEvent.summary}</p>
         </div>
-        <br />
-        <Latest events={events} />
+
+        <br/>
+        <Latest events={events}/>
         <div
-          onMouseDown={handleMouseDown}
-          onClick={resetWidth}
-          className="opacity-0 group-hover/sidebar:opacity-100 transition cursor-ew-resize absolute h-full w-1 bg-primary/10 right-0 top-0"
+            onMouseDown={handleMouseDown}
+            onClick={resetWidth}
+            className="opacity-0 group-hover/sidebar:opacity-100 transition cursor-ew-resize absolute h-full w-1 bg-primary/10 right-0 top-0"
         />
       </aside>
       <div
-        ref={navbarRef}
-        className={cn(
-          "fixed z-[50] top-1/2 transform -translate-y-1/2 w-[calc(100% - 320px)] overflow-hidden",
-          isResetting && "transition-all ease-in-out duration-300",
-          isMobile && "left-0 w-full",
-        )}
+          ref={navbarRef}
+          className={cn(
+              "fixed z-[50] top-1/2 transform -translate-y-1/2 w-[calc(100% - 320px)] overflow-hidden",
+              isResetting && "transition-all ease-in-out duration-300",
+              isMobile && "left-0 w-full",
+          )}
       >
         <nav className="h-12 w-6 text-muted-foreground group-hover/sidebar:opacity-100 transition">
           {isCollapsed ? (
-            <TooltipProvider>
+              <TooltipProvider>
               <Tooltip delayDuration={0}>
                 <TooltipTrigger>
                   <ChevronRight
