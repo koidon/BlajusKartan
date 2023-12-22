@@ -3,7 +3,7 @@ import { getPoliceEvents } from "@/api/policeEvents/policeEvent-api.ts";
 
 const UseGetPoliceEvents = (datespan: string) => {
   return useQuery({
-    queryKey: [`getPoliceEvents/${datespan}`],
+    queryKey: ["getPoliceEvents", datespan],
     queryFn: () => getPoliceEvents(datespan),
   });
 };

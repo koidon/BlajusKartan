@@ -1,4 +1,4 @@
-import { FeatureGroup, MapContainer, Marker, TileLayer } from "react-leaflet";
+import {FeatureGroup, MapContainer, Marker, TileLayer, ZoomControl} from "react-leaflet";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTrigger } from "@/components/ui/dialog.tsx";
 import { ElementRef, useEffect, useRef, useState } from "react";
 import {EventResponse} from "@/Models/policeEvent.ts";
@@ -8,7 +8,7 @@ import Navigation from "@/components/Navigation.tsx";
 import { useMediaQuery } from "usehooks-ts";
 import InfoPanel from "@/components/InfoPanel.tsx";
 import { iconMapping, warningIcon } from "@/Models/eventIcons.ts";
-import { useNavigate } from "@tanstack/react-router";
+import {useNavigate, useSearch} from "@tanstack/react-router";
 import { Route as IndexRoute } from "@/routes";
 import useGetEventById from "@/Hooks/policeEvent/useGetEventById.tsx";
 type Props = {
@@ -44,8 +44,11 @@ const EventMap = ({eventResponse, datespan}: Props) => {
     type: "FeatureCollection",
     features: []
   });
+  const {id} = useSearch({
+    from: IndexRoute.id
+  })
   const [isMapClicked, setIsMapClicked] = useState(false);
-  const {data: event} = useGetEventById(datespan);
+  const {data: event} = useGetEventById(datespan, id);
   const dialogTriggerRef = useRef<ElementRef<"button">>(null);
 
   useEffect(() => {
@@ -84,32 +87,6 @@ const EventMap = ({eventResponse, datespan}: Props) => {
     }).then()
   };
 
-/*  const EventMap = () => {
-    const [showCurrentEvent, setShowCurrentEvent] = useState(false);
-    const [selectedEvent, setSelectedEvent] = useState<EventEntity | undefined>(/!* Initial value *!/);
-    
-    const handleMarkerClick = (eventEntity: EventEntity) => {
-      setSelectedEvent(eventEntity);
-      setShowCurrentEvent(true);
-    };
-
-    const handleCloseCurrentEvent = () => {
-      setShowCurrentEvent(false);
-      setSelectedEvent(undefined);
-    };*/
-
-/*    return (
-        <>
-          {showCurrentEvent && (
-              <div className="fixed inset-0 flex items-center justify-center">
-                <CurrentEvent event={selectedEvent} />
-                <button onClick={handleCloseCurrentEvent}>Close</button>
-              </div>
-          )}
-        </>
-    );
-  };*/
-
   return (
     <>
     {!isMobile ? (
@@ -140,7 +117,9 @@ const EventMap = ({eventResponse, datespan}: Props) => {
         zoom={5}
         scrollWheelZoom={true}
         style={{ zIndex: 0 }}
+        zoomControl={false}
       >
+        <ZoomControl position={"topright"}/>
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"

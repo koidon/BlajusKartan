@@ -23,7 +23,7 @@ export const Route = new FileRoute("/").createRoute({
 function IndexComponent() {
   const datespan = dayjs().format("YYYY-MM-DD");
   //const datespan = "2023-12-13";
-  const { data: eventResponse, isLoading } = useGetPoliceEvents(datespan);
+  const { data: eventResponse, isPending } = useGetPoliceEvents(datespan);
   useEventSubscription(datespan);
 
   useEffect(() => {
@@ -35,7 +35,7 @@ function IndexComponent() {
     }
   }, [eventResponse]);
 
-  if (isLoading) {
+  if (isPending) {
     return "Laddar...";
   }
 

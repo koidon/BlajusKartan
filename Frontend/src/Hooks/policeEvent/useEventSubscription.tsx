@@ -31,7 +31,7 @@ const UseEventSubscription = (datespan: string) => {
           .then(() => {
             connectionRef.on("ReceiveEvents", (newEvents) => {
               if (newEvents.length !== 0) {
-                queryClient.setQueryData([`getPoliceEvents/${datespan}`], (oldData: EventResponse | undefined) => {
+                queryClient.setQueryData(["getPoliceEvents", datespan], (oldData: EventResponse | undefined) => {
                   if (oldData) {
                     const updatedData: EventResponse = {
                       ...oldData,
