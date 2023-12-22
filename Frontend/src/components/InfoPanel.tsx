@@ -64,10 +64,6 @@ const InfoPanel = ({ events, datespan }: Props) => {
     if (sidebarRef.current && navbarRef.current) {
       sidebarRef.current.style.width = `${newWidth}px`;
       navbarRef.current.style.setProperty("left", `${newWidth + 80}px`);
-      navbarRef.current.style.setProperty(
-        "width",
-        `calc(100% - ${newWidth}px)`,
-      );
     }
   };
 
@@ -83,10 +79,6 @@ const InfoPanel = ({ events, datespan }: Props) => {
       setIsResetting(true);
 
       sidebarRef.current.style.width = isMobile ? "100%" : "320px";
-      navbarRef.current.style.setProperty(
-        "width",
-        isMobile ? "0" : "calc(100% - 320px)",
-      );
       navbarRef.current.style.setProperty("left", isMobile ? "100%" : "400px");
       setTimeout(() => setIsResetting(false), 300);
     }
@@ -98,7 +90,6 @@ const InfoPanel = ({ events, datespan }: Props) => {
       setIsResetting(true);
 
       sidebarRef.current.style.width = "0";
-      navbarRef.current.style.setProperty("width", "100%");
       navbarRef.current.style.setProperty("left", "80px");
       setTimeout(() => setIsResetting(false), 300);
     }
@@ -140,7 +131,7 @@ const InfoPanel = ({ events, datespan }: Props) => {
       <div
           ref={navbarRef}
           className={cn(
-              "fixed z-[50] top-1/2 transform -translate-y-1/2 w-[calc(100% - 320px)] overflow-hidden",
+              "fixed z-[50] top-1/2 transform -translate-y-1/2 w-6 overflow-hidden",
               isResetting && "transition-all ease-in-out duration-300",
               isMobile && "left-0 w-full",
           )}

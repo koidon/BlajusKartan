@@ -1,8 +1,0 @@
-﻿{
-  "dependencies": {
-    "react-icons": "^4.12.0"
-  },
-  "devDependencies": {
-    "@types/leaflet": "^1.9.8"
-  }
-}

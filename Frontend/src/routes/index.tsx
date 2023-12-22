@@ -14,7 +14,7 @@ type eventFilter = {
 export const Route = new FileRoute("/").createRoute({
   validateSearch: (search: Record<string, unknown>): eventFilter => {
     return {
-      id: Number(search?.id)
+      id: Number(search.id)
     }
   },
   component: IndexComponent
@@ -22,7 +22,7 @@ export const Route = new FileRoute("/").createRoute({
 
 function IndexComponent() {
   const datespan = dayjs().format("YYYY-MM-DD");
-  //const datespan = "2023-12-17";
+  //const datespan = "2023-12-13";
   const { data: eventResponse, isLoading } = useGetPoliceEvents(datespan);
   useEventSubscription(datespan);
 

@@ -19,7 +19,7 @@ const UseGetEventById = (datespan: string) => {
       if (eventsData && eventsData.length > 0) {
         const specificEvent = eventsData.find((d) => d.id === id);
 
-        return specificEvent || eventsData.reduce((prev, current) =>
+        return specificEvent ?? eventsData.reduce((prev, current) =>
           prev.id > current.id ? prev : current
         );
       }

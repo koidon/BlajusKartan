@@ -21,7 +21,9 @@ function RootComponent() {
             <main>
               <Outlet />
             </main>
-            <TanStackRouterDevtools position="bottom-right" />
+          </div>
+          <div className="absolute z-[999999999]">
+            <TanStackRouterDevtools position="bottom-right"/>
             <ReactQueryDevtools initialIsOpen={false} />
           </div>
         </>
