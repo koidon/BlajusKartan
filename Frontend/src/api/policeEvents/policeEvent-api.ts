@@ -1,6 +1,7 @@
 import axios from "@/api/axiosInstance.ts";
 import { EventIdResponse, EventResponse } from "@/Models/policeEvent.ts";
 export const getPoliceEvents = async (datespan: string) => {
+  await new Promise((r) => setTimeout(r, 500))
   const response = await axios.get<EventResponse>(
     `getPoliceEvents/${datespan}`,
   );

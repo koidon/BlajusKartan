@@ -1,11 +1,13 @@
-import { Outlet, RootRoute } from "@tanstack/react-router";
+import {Outlet, rootRouteWithContext} from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/router-devtools";
 import Navigation from "@/components/Navigation.tsx";
 import { useMediaQuery } from "usehooks-ts";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import {QueryClient} from "@tanstack/react-query";
 
-export const Route = new RootRoute({
-
+export const Route = rootRouteWithContext<{
+  queryClient: QueryClient
+}>()({
   component: RootComponent,
 });
 
@@ -24,7 +26,7 @@ function RootComponent() {
           </div>
           <div className="absolute z-[999999999]">
             <TanStackRouterDevtools position="bottom-right"/>
-            <ReactQueryDevtools initialIsOpen={false} />
+            <ReactQueryDevtools initialIsOpen={false} buttonPosition="bottom-left"/>
           </div>
         </>
       ) : (

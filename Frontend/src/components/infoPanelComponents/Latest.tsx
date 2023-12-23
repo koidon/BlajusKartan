@@ -10,7 +10,7 @@ import { useNavigate } from "@tanstack/react-router";
 import { Route as IndexRoute} from "@/routes/index.tsx"
 
 type Props = {
-  events: EventResponse | undefined;
+  events: EventResponse;
 };
 
 const Latest = ({ events }: Props) => {
@@ -42,7 +42,7 @@ const Latest = ({ events }: Props) => {
                     Senaste events
                   </Drawer.Title>
                   <ScrollArea className="h-72 rounded-md border">
-                    {events?.data.map((eventEntity) => {
+                    {events.data.map((eventEntity) => {
                       return (
                         <div key={eventEntity.id} className="hover:shadow-md" onClick={() => {
                           navigate({
@@ -61,7 +61,7 @@ const Latest = ({ events }: Props) => {
         <div className="mt-auto">
         <h3 className="mb-4 text-md font-medium leading-none">Senaste nytt</h3>
         <ScrollArea className="h-72 rounded-md border">
-          {events?.data.map((eventEntity) =>
+          {events.data.map((eventEntity) =>
             <div key={eventEntity.id} className="hover:shadow-md">
             <div  onClick={() => {
               navigate({

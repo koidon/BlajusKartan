@@ -9,31 +9,22 @@ import {
     TooltipTrigger,
 } from "@/components/ui/tooltip.tsx";
 import Latest from "@/components/infoPanelComponents/Latest.tsx";
-import {EventResponse} from "@/Models/policeEvent.ts";
+import {EventEntity, EventResponse} from "@/Models/policeEvent.ts";
 import {Separator} from "@/components/ui/separator.tsx";
-import useGetEventById from "@/Hooks/policeEvent/useGetEventById.tsx";
-import {useSearch} from "@tanstack/react-router";
-import {Route as IndexRoute} from "@/routes";
 
 type Props = {
-    events: EventResponse | undefined;
-    datespan: string
+    events: EventResponse;
+    event: EventEntity | undefined
 };
 
-const InfoPanel = ({events, datespan}: Props) => {
+const InfoPanel = ({events, event}: Props) => {
     const isMobile = useMediaQuery("(max-width: 768px)");
-
     const isResizingRef = useRef(false);
     const sidebarRef = useRef<ElementRef<"aside">>(null);
     const navbarRef = useRef<ElementRef<"div">>(null);
     const [isResetting, setIsResetting] = useState(false);
     const [isCollapsed, setIsCollapsed] = useState(isMobile);
     //const {currentEvent} = useCurrentEvent();
-    const {id} = useSearch({
-        from: IndexRoute.id,
-    })
-    const defaultEventId = events?.data[events?.data.length - 1].id
-    const {data: event, isPending} = useGetEventById(datespan, id || defaultEventId);
 
     useEffect(() => {
         if (isMobile) {
@@ -109,7 +100,6 @@ const InfoPanel = ({events, datespan}: Props) => {
                     "group/sidebar h-full bg-secondary overflow-hidden relative flex w-60 flex-col z-[9999]",
                     isResetting && "transition-all ease-in-out duration-300",
                     isMobile && "w-0",
-                    isPending && "w-0"
                 )}
             >
                 <div className="mt-2 border border-blue-500 p-4 rounded shadow-md">

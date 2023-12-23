@@ -8,6 +8,7 @@ import { FaBeer, FaBomb, FaFire, FaFistRaised, FaMask, FaRadiation, FaSkull, FaS
 import { PiSirenFill } from "react-icons/pi";
 import { IoIosWarning } from "react-icons/io";
 import React from "react";
+import {IconType} from "react-icons";
 
 type IconComponent = React.FC<{ className: string; }>;
 
@@ -108,4 +109,97 @@ export const iconMapping: Record<string, L.DivIcon> = {
   "Kontroll person/fordon": sirenIcon,
   "Fjällräddning": sirenIcon,
   "Uppdatering": sirenIcon
+};
+
+// Define React components for each icon
+const TrafficIcon = GiTrafficCone;
+const GunIcon = FaGun;
+const EnvIcon = FaRadiation;
+const ThiefIcon = FaMask;
+const BombIcon = FaBomb;
+const KnifeIcon = GiBowieKnife;
+const FireIcon = FaFire;
+const BeerIcon = FaBeer;
+const DrugIcon = FaSyringe;
+const FistIcon = FaFistRaised;
+const DeadIcon = FaSkull;
+const FraudIcon = FaMasksTheater;
+const SirenIcon = PiSirenFill;
+export const WarningIcon = IoIosWarning;
+
+// Define popup icons using React components
+export const popupIcons:Record<string, IconType>  = {
+  // traffic
+  "Trafikbrott": TrafficIcon,
+  "Trafikhinder": TrafficIcon,
+  "Trafikkontroll": TrafficIcon,
+  "Trafikolycka": TrafficIcon,
+  "Trafikolycka, personskada": TrafficIcon,
+  "Trafikolycka, singel": TrafficIcon,
+  "Trafikolycka, smitning från": TrafficIcon,
+  "Trafikolycka, vilt": TrafficIcon,
+  "Olovlig körning": TrafficIcon,
+  // gun
+  "Vapenlagen": GunIcon,
+  "Rån väpnat": ThiefIcon,
+  "Olaga hot": GunIcon,
+  "Skottlossning": GunIcon,
+  "Skottlossning, misstänkt": GunIcon,
+  // robber
+  "Rån": ThiefIcon,
+  "Rån övrigt": ThiefIcon,
+  "Rån, försök": ThiefIcon,
+  "Stöld": ThiefIcon,
+  "Stöld, försök": ThiefIcon,
+  "Stöld/inbrott": ThiefIcon,
+  "Inbrott": ThiefIcon,
+  "Inbrott, försök": ThiefIcon,
+  "Motorfordon, anträffat stulet": ThiefIcon,
+  "Motorfordon, stöld": ThiefIcon,
+  "Larm inbrott": ThiefIcon,
+  "Häleri": ThiefIcon,
+  // environment
+  "Spridning smittsamma kemikalier": EnvIcon,
+  "Miljöbrott": EnvIcon,
+  "Naturkatastrof": EnvIcon,
+  // bomb
+  "Bombhot": BombIcon,
+  "Detonation": BombIcon,
+  // knife
+  "Knivlagen": KnifeIcon,
+  // fire
+  "Brand": FireIcon,
+  "Brand automatlarm": FireIcon,
+  // alcohol
+  "Alkohollagen": BeerIcon,
+  "Fylleri/LOB": BeerIcon,
+  "Rattfylleri": BeerIcon,
+  // drugs
+  "Narkotikabrott": DrugIcon,
+  // abuse
+  "Misshandel": FistIcon,
+  "Misshandel, grov": FistIcon,
+  "Ofog barn/ungdom": FistIcon,
+  "Våld/hot mot tjänsteman": FistIcon,
+  "Våldtäkt": FistIcon,
+  "Våldtäkt, försök": FistIcon,
+  "Vållande till kroppsskada": FistIcon,
+  "Larm överfall": FistIcon,
+  "Bråk": FistIcon,
+  // death
+  "Mord/dråp": DeadIcon,
+  "Mord/dråp, försök": DeadIcon,
+  "Anträffad död": DeadIcon,
+  // fraud
+  "Berägeri": FraudIcon,
+  "Missbruk av urkund": FraudIcon,
+  "Förfalskningsbrott": FraudIcon,
+  // siren
+  "Varningslarm/haveri": SirenIcon,
+  "Räddningsinsats": SirenIcon,
+  "Polisinsats/kommendering": SirenIcon,
+  "Ordningslagen": SirenIcon,
+  "Kontroll person/fordon": SirenIcon,
+  "Fjällräddning": SirenIcon,
+  "Uppdatering": SirenIcon,
 };

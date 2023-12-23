@@ -1,47 +1,36 @@
-import { FileRoute } from "@tanstack/react-router";
+import {FileRoute} from "@tanstack/react-router";
 import "leaflet/dist/leaflet.css";
-import useGetPoliceEvents from "@/Hooks/policeEvent/useGetPoliceEvents.tsx";
 import dayjs from "dayjs";
 
 import EventMap from "@/components/EventMap.tsx";
-import { useEffect } from "react";
 import useEventSubscription from "@/Hooks/policeEvent/useEventSubscription.tsx";
+import {useSuspenseQuery} from "@tanstack/react-query";
+import useEventsOptions from "@/Hooks/policeEvent/useEventsOptions.tsx";
 
 type eventFilter = {
-  id: number;
+    id: number;
 }
 
 export const Route = new FileRoute("/").createRoute({
-  validateSearch: (search: Record<string, unknown>): eventFilter => {
-    return {
-      id: Number(search.id)
-    }
-  },
-  component: IndexComponent
+    validateSearch: (search: Record<string, unknown>): eventFilter => {
+        return {
+            id: Number(search?.id)
+        }
+    },
+    loader: ({context: {queryClient}}) =>
+       queryClient.ensureQueryData(useEventsOptions()),
+    component: IndexComponent
 });
 
 function IndexComponent() {
-  const datespan = dayjs().format("YYYY-MM-DD");
-  //const datespan = "2023-12-13";
-  const { data: eventResponse, isPending } = useGetPoliceEvents(datespan);
-  useEventSubscription(datespan);
+    const datespan = dayjs().format("YYYY-MM-DD");
+    //const datespan = "2023-12-13";
+    const {data: eventResponse} = useSuspenseQuery(useEventsOptions());
+    useEventSubscription(datespan);
 
-  useEffect(() => {
-    if (eventResponse) {
-      eventResponse.data.sort((a, b) => {
-
-        return b.policeEvent.name.localeCompare(a.policeEvent.name);
-      });
-    }
-  }, [eventResponse]);
-
-  if (isPending) {
-    return "Laddar...";
-  }
-
-  return (
-     <EventMap eventResponse={eventResponse} datespan={datespan}/>
-  );
+    return (
+        <EventMap eventResponse={eventResponse} datespan={datespan}/>
+    );
 }
 
 export default IndexComponent;
