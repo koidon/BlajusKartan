@@ -11,10 +11,14 @@ import {useNavigate, useSearch} from "@tanstack/react-router";
 import {Route as IndexRoute} from "@/routes";
 import useGetEventById from "@/Hooks/policeEvent/useGetEventById.tsx";
 import CurrentEvent from "@/components/infoPanelComponents/CurrentEvent.tsx";
+import icon from 'leaflet/dist/images/marker-icon.png';
+import iconShadow from 'leaflet/dist/images/marker-shadow.png';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
+
 
 type Props = {
     eventResponse: EventResponse;
-    datespan: string;
 }
 
 export type GeojsonFeatures = {
@@ -48,8 +52,19 @@ const convertCoordinates = ((input: string): number[] => {
     return [longitude, latitude];
 })
 
-const EventMap = ({eventResponse, datespan}: Props) => {
+
+let DefaultIcon = L.icon({
+    iconUrl: icon,
+    shadowUrl: iconShadow
+});
+
+L.Marker.prototype.options.icon = DefaultIcon;
+
+const EventMap = ({eventResponse}: Props) => {
     const navigate = useNavigate({from: IndexRoute.id})
+    const {date} = useSearch({
+        from: IndexRoute.id
+    })
     const isMobile = useMediaQuery("(max-width: 768px)");
     const position = {lat: 63.1282, lng: 18.6435};
     const [geoJsonFeatures, setGeoJsonFeatures] = useState<GeojsonFeatures>({
@@ -61,12 +76,14 @@ const EventMap = ({eventResponse, datespan}: Props) => {
         from: IndexRoute.id
     })
     const defaultEventId = eventResponse.data[0].id;
-    const {data: event} = useGetEventById(datespan, id || defaultEventId);
+    const {data: event} = useGetEventById(date, id || defaultEventId);
     const [isMapClicked, setIsMapClicked] = useState(false);
     const [isEventSelected, setIsEventSelected] = useState(false);
 
     useEffect(() => {
-        const features = eventResponse.data.map((eventEntity) => ({
+        const features = eventResponse.data
+            .filter((eventEntity) => eventEntity.policeEvent.type !== "Sammanfattning natt" && eventEntity.policeEvent.type !== "Sammanfattning kväll och natt")
+            .map((eventEntity) => ({
             type: "Feature",
             id: eventEntity.id,
             properties: {
