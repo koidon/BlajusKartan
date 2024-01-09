@@ -2,7 +2,7 @@ import {useQuery, useQueryClient} from "@tanstack/react-query";
 import {EventResponse} from "@/Models/policeEvent.ts";
 
 
-const UseGetEventById = (datespan: string, id: number ) => {
+const UseGetEventById = (datespan: string | undefined, id: number ) => {
     const queryClient = useQueryClient();
     return useQuery({
         queryKey: ["getPoliceEvent", id],

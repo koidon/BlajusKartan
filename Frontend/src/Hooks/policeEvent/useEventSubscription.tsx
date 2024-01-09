@@ -7,7 +7,7 @@ const hubUrl = "https://blaljuskartan-api.azurewebsites.net/eventHub";
 
 
 
-const UseEventSubscription = (datespan: string) => {
+const UseEventSubscription = (datespan: string | undefined) => {
   const queryClient = useQueryClient();
   const [connectionRef, setConnection] = useState<HubConnection>()
 
@@ -35,7 +35,7 @@ const UseEventSubscription = (datespan: string) => {
                   if (oldData) {
                     const updatedData: EventResponse = {
                       ...oldData,
-                      data: [...oldData.data, ...newEvents]
+                      data: [...newEvents,...oldData.data]
                     };
                     return updatedData;
                   } else {

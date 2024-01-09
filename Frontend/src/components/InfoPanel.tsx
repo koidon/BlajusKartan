@@ -11,6 +11,8 @@ import {
 import Latest from "@/components/infoPanelComponents/Latest.tsx";
 import {EventEntity, EventResponse} from "@/Models/policeEvent.ts";
 import {Separator} from "@/components/ui/separator.tsx";
+import useGetBingNewsResult from "@/Hooks/useGetBingNewsResult.tsx";
+import DatePicker from "@/components/infoPanelComponents/DatePicker.tsx";
 
 type Props = {
     events: EventResponse;
@@ -24,6 +26,8 @@ const InfoPanel = ({events, event}: Props) => {
     const navbarRef = useRef<ElementRef<"div">>(null);
     const [isResetting, setIsResetting] = useState(false);
     const [isCollapsed, setIsCollapsed] = useState(isMobile);
+    const {data: newsResult} = useGetBingNewsResult(event?.policeEvent.name)
+    console.log(newsResult)
     //const {currentEvent} = useCurrentEvent();
 
     useEffect(() => {
@@ -102,6 +106,7 @@ const InfoPanel = ({events, event}: Props) => {
                     isMobile && "w-0",
                 )}
             >
+                <DatePicker/>
                 <div className="mt-2 border border-blue-500 p-4 rounded shadow-md">
                     <h3 className="mb-4 text-lg font-semibold">{event?.policeEvent?.name.split(",")[1].trim() + " i " + event?.policeEvent?.location.name}</h3>
                     <Separator className="my-3"/>
@@ -116,6 +121,12 @@ const InfoPanel = ({events, event}: Props) => {
                     </a>
                     <Separator className="my-3"/>
                     <p className="text-gray-700">{event?.policeEvent.summary}</p>
+                    <br/>
+                    <h2>Relaterade länkar</h2>
+                    {newsResult?.webPages?.value?.slice(0,5).map((webPage) => (
+                        <a href={webPage.url} key={webPage.id} className="text-blue-500 hover:underline block mb-3">{webPage.name}</a>
+
+                    ))}
                 </div>
 
                 <br/>

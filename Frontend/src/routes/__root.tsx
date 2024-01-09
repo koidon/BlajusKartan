@@ -6,7 +6,7 @@ import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import {QueryClient} from "@tanstack/react-query";
 
 export const Route = rootRouteWithContext<{
-  queryClient: QueryClient
+  queryClient: QueryClient,
 }>()({
   component: RootComponent,
 });
@@ -15,7 +15,7 @@ function RootComponent() {
   const isMobile = useMediaQuery("(max-width: 768px)");
 
   return (
-    <>
+      <>
       {!isMobile ? (
         <>
           <div className="h-full flex flex-none dark:bg-[#1F1F1F] overflow-auto w-full">
@@ -38,6 +38,6 @@ function RootComponent() {
           </div>
         </>
       )}
-    </>
+      </>
   );
 }

@@ -8,9 +8,9 @@ import {createSyncStoragePersister} from "@tanstack/query-sync-storage-persister
 const queryClient = new QueryClient({
     defaultOptions: {
         queries: {
-            gcTime: 1000 * 60 * 60 * 24, // 24 hours
             refetchOnWindowFocus: false,
             staleTime: 1000 * 60 * 60 * 24, // 24 hours
+            retry: 0
         },
     },
 });
@@ -21,7 +21,7 @@ const router = new Router({
         queryClient,
     },
     defaultPreload: "intent",
-    defaultPreloadDelay: 0,
+    defaultPreloadStaleTime: 0,
 });
 
 declare module "@tanstack/react-router" {
