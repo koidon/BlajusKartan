@@ -4,6 +4,7 @@ import { ElementRef, useRef } from "react";
 import { cn } from "@/lib/utils.ts";
 import Logo from "@/assets/icon.svg";
 import { History, Home } from "lucide-react";
+import dayjs from "dayjs";
 
 const Navigation = () => {
   const isMobile = useMediaQuery("(max-width: 768px)");
@@ -44,6 +45,10 @@ const Navigation = () => {
           <Home />
           <Link
             to="/"
+            search={{
+              id: 1,
+              date: dayjs().format("YYYY-MM-DD")
+            }}
             className="block py-2 px-3 text-blue-500"
             activeProps={{ className: `font-bold` }}
           >
