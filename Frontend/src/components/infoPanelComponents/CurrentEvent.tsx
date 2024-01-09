@@ -73,7 +73,7 @@ const CurrentEvent = ({event}: Props) => {
                     </Drawer.Portal>
                 </Drawer.Root>
             ) : (
-                <div className="fixed h-full mt-2 border border-blue-500 p-4 rounded shadow-md">
+                <div className="mt-2 border border-blue-500 p-4 rounded shadow-md">
                     <h3 className="mb-4 text-lg font-semibold">
                         {event?.policeEvent?.name.split(",")[1]?.trim() +
                             " i " +
