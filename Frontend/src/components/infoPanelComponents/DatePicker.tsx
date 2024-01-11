@@ -22,10 +22,11 @@ const DatePicker = () => {
     return (
         <div className="flex content-between  mt-1">
             <div className="p-2 m-1 border-2 rounded-sm">
-                <ChevronLeft onClick={() => {
+                <ChevronLeft onClick={(newDate) => {
                     navigate({
                         search: () => ({ date: dayjs(date).subtract(1,"day").format("YYYY-MM-DD") })
                     }).then();
+                    setSelectedDate(newDate)
                 }}/>
             </div>
             <Popover>
