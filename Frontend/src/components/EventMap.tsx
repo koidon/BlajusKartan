@@ -1,5 +1,5 @@
 import {FeatureGroup, MapContainer, Marker, Popup, TileLayer, ZoomControl} from "react-leaflet";
-import {useEffect, useState} from "react";
+import {useEffect, useLayoutEffect, useState} from "react";
 import {EventResponse} from "@/Models/policeEvent.ts";
 import {cn} from "@/lib/utils.ts";
 import Latest from "@/components/infoPanelComponents/Latest.tsx";
@@ -75,25 +75,34 @@ const EventMap = ({eventResponse}: Props) => {
     const {id} = useSearch({
         from: IndexRoute.id
     })
-    const defaultEventId = eventResponse.data[0].id;
+    const defaultEventId = eventResponse.data.length > 0 ? eventResponse.data[0].id ?? 0 : 0;
     const {data: event} = useGetEventById(date, id || defaultEventId);
     const [isMapClicked, setIsMapClicked] = useState(false);
     const [isEventSelected, setIsEventSelected] = useState(false);
+
+
+    const [unmountMap, setunmountMap] = useState(false);
+    useLayoutEffect(() => {
+        setunmountMap(false);
+        return () => {
+            setunmountMap(true);
+        };
+    }, []);
 
     useEffect(() => {
         const features = eventResponse.data
             .filter((eventEntity) => eventEntity.policeEvent.type !== "Sammanfattning natt" && eventEntity.policeEvent.type !== "Sammanfattning kväll och natt")
             .map((eventEntity) => ({
-            type: "Feature",
-            id: eventEntity.id,
-            properties: {
-                type: eventEntity.policeEvent.type,
-            },
-            geometry: {
-                type: "Point",
-                coordinates: convertCoordinates(eventEntity.policeEvent.location.gps),
-            }
-        }));
+                type: "Feature",
+                id: eventEntity.id,
+                properties: {
+                    type: eventEntity.policeEvent.type,
+                },
+                geometry: {
+                    type: "Point",
+                    coordinates: convertCoordinates(eventEntity.policeEvent.location.gps),
+                }
+            }));
 
 
         const groupedByCoordinates = features.reduce<Record<string, Array<typeof features[0]>>>((acc, feature) => {
@@ -127,115 +136,116 @@ const EventMap = ({eventResponse}: Props) => {
 
     const handleMarkerClick = (id: number) => {
         setIsEventSelected(true);
-        console.log(isEventSelected)
         navigate({
             search: () => ({id: id})
         }).then()
     };
 
     return (
-        <>
-            {!isMobile ? (
-                <InfoPanel
-                    events={eventResponse}
-                    event={event}
-                />
-            ) : <>
-                {isEventSelected && (
-                    <div className={cn(
-                        "fixed bottom-0 left-0 right-0 z-10 mb-[4.25rem] transition-all duration-300 ease-in-out",
-                        isMapClicked && "transform translate-y-full opacity-0"
-                    )}>
-                        <CurrentEvent event={event}/>
+        !unmountMap && (
+            <>
+                {!isMobile ? (
+                    <InfoPanel
+                        events={eventResponse}
+                        event={event}
+                    />
+                ) : <>
+                    {isEventSelected && (
+                        <div className={cn(
+                            "fixed bottom-0 left-0 right-0 z-10 mb-[4.25rem] transition-all duration-300 ease-in-out",
+                            isMapClicked && "transform translate-y-full opacity-0"
+                        )}>
+                            <CurrentEvent event={event}/>
+                        </div>
+                    )
+                    }
+                    <div
+                        className={cn(
+                            "fixed bottom-0 left-0 right-0 z-10 mb-[4.25rem] transition-all duration-300 ease-in-out",
+                            isMapClicked && "transform translate-y-full opacity-0"
+                        )}
+                    >
+                        <div className={cn(isEventSelected && "hidden")}>
+                            <Latest events={eventResponse}/>
+                        </div>
                     </div>
+                    <div
+                        className={cn(
+                            "fixed bottom-0 left-0 right-0 z-10 transition-all duration-300 ease-in-out",
+                            isMapClicked && "transform translate-y-full opacity-0"
+                        )}
+                    >
+                        <Navigation/>
+                    </div>
+                </>}
+
+                <div className="absolute inset-0 w-full" onClick={handleMapClick}>
+                    <MapContainer
+                        center={position}
+                        zoom={5}
+                        scrollWheelZoom={true}
+                        style={{zIndex: 0}}
+                        zoomControl={false}
+                    >
+                        <ZoomControl position={"topright"}/>
+                        <TileLayer
+                            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                        />
+                        {geoJsonFeatures.differentCoordinatesFeature.map((feature) => {
+                            const selectedIcon =
+                                iconMapping[feature.properties.type] || warningIcon;
+                            return (
+                                <FeatureGroup key={feature.id}>
+                                    <Marker
+                                        position={[
+                                            feature.geometry.coordinates[1],
+                                            feature.geometry.coordinates[0]
+                                        ]}
+                                        eventHandlers={{
+                                            click: () =>
+                                                handleMarkerClick(feature.id)
+                                        }}
+                                        icon={selectedIcon}
+                                    >
+                                    </Marker>
+                                </FeatureGroup>
+                            )
+                                ;
+                        })}
+                        {geoJsonFeatures.coordinatesGroups.map((feature, index) => {
+                            return (
+                                <FeatureGroup key={index}>
+                                    <Marker
+                                        position={[
+                                            feature[0].geometry.coordinates[1],
+                                            feature[0].geometry.coordinates[0]
+                                        ]}
+                                    >
+                                        <Popup>
+                                            <div className="flex">
+                                                {geoJsonFeatures.coordinatesGroups[index].map((otherFeature) => {
+                                                    const IconComponent =
+                                                        popupIcons[otherFeature.properties.type] || WarningIcon;
+                                                    return (
+                                                        <IconComponent
+                                                            className="w-[32px] h-[32px]"
+                                                            key={otherFeature.id}
+                                                            onClick={() => handleMarkerClick(otherFeature.id)}
+                                                        />
+                                                    );
+                                                })}
+                                            </div>
+                                        </Popup>
+                                    </Marker>
+                                </FeatureGroup>
+                            );
+                        })}
+                    </MapContainer>
+                </div>
                 )
-            }
-                <div
-                    className={cn(
-                        "fixed bottom-0 left-0 right-0 z-10 mb-[4.25rem] transition-all duration-300 ease-in-out",
-                        isMapClicked && "transform translate-y-full opacity-0"
-                    )}
-                >
-                    <div className={cn(isEventSelected && "hidden")}>
-                        <Latest events={eventResponse}/>
-                    </div>
-                </div>
-                <div
-                    className={cn(
-                        "fixed bottom-0 left-0 right-0 z-10 transition-all duration-300 ease-in-out",
-                    isMapClicked && "transform translate-y-full opacity-0"
-                    )}
-                >
-                    <Navigation/>
-                </div>
-            </>}
-                
-                    <div className="absolute inset-0 w-full" onClick={handleMapClick}>
-                        <MapContainer
-                            center={position}
-                            zoom={5}
-                            scrollWheelZoom={true}
-                            style={{zIndex: 0}}
-                            zoomControl={false}
-                        >
-                            <ZoomControl position={"topright"}/>
-                            <TileLayer
-                                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                            />
-                            {geoJsonFeatures.differentCoordinatesFeature.map((feature) => {
-                                const selectedIcon =
-                                    iconMapping[feature.properties.type] || warningIcon;
-                                return (
-                                    <FeatureGroup key={feature.id}>
-                                        <Marker
-                                            position={[
-                                                feature.geometry.coordinates[1],
-                                                feature.geometry.coordinates[0]
-                                            ]}
-                                            eventHandlers={{
-                                                click: () =>
-                                                    handleMarkerClick(feature.id)
-                                            }}
-                                            icon={selectedIcon}
-                                        >
-                                        </Marker>
-                                    </FeatureGroup>
-                                )
-                                    ;
-                            })}
-                            {geoJsonFeatures.coordinatesGroups.map((feature, index) => {
-                                return (
-                                    <FeatureGroup key={index}>
-                                        <Marker
-                                            position={[
-                                                feature[0].geometry.coordinates[1],
-                                                feature[0].geometry.coordinates[0]
-                                            ]}
-                                        >
-                                            <Popup>
-                                                <div className="flex">
-                                                    {geoJsonFeatures.coordinatesGroups[index].map((otherFeature) => {
-                                                        const IconComponent =
-                                                            popupIcons[otherFeature.properties.type] || WarningIcon;
-                                                        return (
-                                                            <IconComponent
-                                                                className="w-[32px] h-[32px]"
-                                                                key={otherFeature.id}
-                                                                onClick={() => handleMarkerClick(otherFeature.id)}
-                                                            />
-                                                        );
-                                                    })}
-                                                </div>
-                                            </Popup>
-                                        </Marker>
-                                    </FeatureGroup>
-                                );
-                            })}
-                        </MapContainer>
-                    </div>
-            )
-        </>
+            </>
+        )
     );
 }
 

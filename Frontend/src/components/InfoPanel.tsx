@@ -27,7 +27,6 @@ const InfoPanel = ({events, event}: Props) => {
     const [isResetting, setIsResetting] = useState(false);
     const [isCollapsed, setIsCollapsed] = useState(isMobile);
     const {data: newsResult} = useGetBingNewsResult(event?.policeEvent.name)
-    console.log(newsResult)
     //const {currentEvent} = useCurrentEvent();
 
     useEffect(() => {

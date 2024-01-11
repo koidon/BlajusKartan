@@ -22,7 +22,11 @@ const DatePicker = () => {
     return (
         <div className="flex content-between  mt-1">
             <div className="p-2 m-1 border-2 rounded-sm">
-                <ChevronLeft/>
+                <ChevronLeft onClick={() => {
+                    navigate({
+                        search: () => ({ date: dayjs(date).subtract(1,"day").format("YYYY-MM-DD") })
+                    }).then();
+                }}/>
             </div>
             <Popover>
             <PopoverTrigger asChild>
@@ -34,7 +38,7 @@ const DatePicker = () => {
                     )}
                 >
                     <CalendarIcon className="mr-2 h-4 w-4"/>
-                    {date ? dayjs().format('YYYY-MM-DD') : <span>Datum</span>}
+                    {selectedDate ? dayjs(selectedDate).format('YYYY-MM-DD') : <span>Datum</span>}
                 </Button>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0 z-[999999]">
@@ -44,10 +48,11 @@ const DatePicker = () => {
                     selected={selectedDate}
                     onSelect={(newDate) => {
                         // Update state with the selected date
-                        setSelectedDate(newDate);
 
                         // Convert newDate to string if needed
                         const formattedDate = newDate ? dayjs(newDate).format('YYYY-MM-DD') : null;
+                        setSelectedDate(newDate);
+
 
                         navigate({
                             search: () => ({ date: formattedDate })
@@ -58,7 +63,11 @@ const DatePicker = () => {
             </PopoverContent>
         </Popover>
             <div className="p-2 m-1 border-2 rounded-sm">
-                <ChevronRight/>
+                <ChevronRight onClick={() => {
+                    navigate({
+                        search: () => ({ date: dayjs(date).add(1,"day").format("YYYY-MM-DD") })
+                    }).then();
+                }}/>
             </div>
         </div>
     )

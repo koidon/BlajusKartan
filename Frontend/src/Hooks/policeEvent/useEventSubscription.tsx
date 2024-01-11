@@ -46,7 +46,6 @@ const UseEventSubscription = (datespan: string | undefined) => {
 
             });
           })
-          .catch(console.error)
       } catch (error) {
         console.log(error)
       }

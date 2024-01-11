@@ -41,7 +41,7 @@ export const getBingNewsResults = async (q: string | undefined) => {
     const response = await axios.get<SearchResponse>(
         'https://api.bing.microsoft.com/v7.0/search', {
             params, headers: {
-                'Ocp-Apim-Subscription-Key': 'a34207d862ca4db09b3254556bba2a4c'
+                'Ocp-Apim-Subscription-Key': '/a34207d862ca4db09b3254556bba2a4c'
             }
         },
     );
