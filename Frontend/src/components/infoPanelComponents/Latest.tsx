@@ -8,6 +8,7 @@ import {ScrollArea} from "@/components/ui/scroll-area.tsx";
 import {Separator} from "@/components/ui/separator.tsx";
 import {useNavigate} from "@tanstack/react-router";
 import {Route as IndexRoute} from "@/routes/index.tsx"
+import dayjs from "dayjs";
 
 type Props = {
     events: EventResponse;
@@ -48,7 +49,7 @@ const Latest = ({events}: Props) => {
                                             return (
                                                 <div key={eventEntity.id} className="hover:shadow-md" onClick={() => {
                                                     navigate({
-                                                        search: () => ({id: eventEntity.id})
+                                                        search: () => ({id: eventEntity.id, date: dayjs(eventEntity.eventDate).format("YYYY-MM-DD")})
                                                     }).then()
                                                 }}>{eventEntity.policeEvent.name}</div>
                                             );
@@ -67,7 +68,7 @@ const Latest = ({events}: Props) => {
                             <div key={eventEntity.id} className="hover:shadow-md">
                                 <div onClick={() => {
                                     navigate({
-                                        search: () => ({id: eventEntity.id})
+                                        search: () => ({id: eventEntity.id, date: dayjs(eventEntity.eventDate).format("YYYY-MM-DD")})
                                     }).then()
                                 }}>{eventEntity.policeEvent.name}</div>
                                 <Separator className="my-2"/>

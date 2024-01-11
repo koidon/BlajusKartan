@@ -15,6 +15,7 @@ import icon from 'leaflet/dist/images/marker-icon.png';
 import iconShadow from 'leaflet/dist/images/marker-shadow.png';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import dayjs from "dayjs";
 
 
 type Props = {
@@ -28,6 +29,7 @@ export type GeojsonFeatures = {
         id: number;
         properties: {
             type: string;
+            eventDate: string
         };
         geometry: {
             type: string;
@@ -39,6 +41,7 @@ export type GeojsonFeatures = {
         id: number;
         properties: {
             type: string;
+            eventDate: string
         };
         geometry: {
             type: string;
@@ -97,6 +100,7 @@ const EventMap = ({eventResponse}: Props) => {
                 id: eventEntity.id,
                 properties: {
                     type: eventEntity.policeEvent.type,
+                    eventDate: eventEntity.eventDate,
                 },
                 geometry: {
                     type: "Point",
@@ -134,10 +138,10 @@ const EventMap = ({eventResponse}: Props) => {
         setIsMapClicked((prev) => !prev);
     };
 
-    const handleMarkerClick = (id: number) => {
+    const handleMarkerClick = (id: number, date: string) => {
         setIsEventSelected(true);
         navigate({
-            search: () => ({id: id})
+            search: () => ({id: id, date: dayjs(date).format("YYYY-MM-DD")})
         }).then()
     };
 
@@ -204,7 +208,7 @@ const EventMap = ({eventResponse}: Props) => {
                                         ]}
                                         eventHandlers={{
                                             click: () =>
-                                                handleMarkerClick(feature.id)
+                                                handleMarkerClick(feature.id, feature.properties.eventDate)
                                         }}
                                         icon={selectedIcon}
                                     >
@@ -231,7 +235,7 @@ const EventMap = ({eventResponse}: Props) => {
                                                         <IconComponent
                                                             className="w-[32px] h-[32px]"
                                                             key={otherFeature.id}
-                                                            onClick={() => handleMarkerClick(otherFeature.id)}
+                                                            onClick={() => handleMarkerClick(otherFeature.id, otherFeature.properties.eventDate)}
                                                         />
                                                     );
                                                 })}
