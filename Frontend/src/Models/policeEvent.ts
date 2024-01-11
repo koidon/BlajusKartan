@@ -6,7 +6,7 @@ export type EventResponse = {
 
 export type EventEntity = {
   id: number;
-  EventDate: string;
+  eventDate: string;
   policeEvent: PoliceEvent;
 };
 

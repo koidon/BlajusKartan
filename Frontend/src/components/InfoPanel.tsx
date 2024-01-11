@@ -110,7 +110,7 @@ const InfoPanel = ({events, event}: Props) => {
                     <h3 className="mb-4 text-lg font-semibold">{event?.policeEvent?.name.split(",")[1].trim() + " i " + event?.policeEvent?.location.name}</h3>
                     <Separator className="my-3"/>
                     <div className="mb-3">
-                        <p className="text-gray-800">Inträffat: {event?.EventDate}</p>
+                        <p className="text-gray-800">Inträffat: {event?.eventDate}</p>
                         <p className="text-gray-800">Publicerades: {event?.policeEvent.name.split(",")[0].trim()}</p>
                     </div>
                     <Separator className="my-3"/>

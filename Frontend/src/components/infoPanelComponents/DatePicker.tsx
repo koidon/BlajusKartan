@@ -47,9 +47,6 @@ const DatePicker = () => {
                     mode="single"
                     selected={selectedDate}
                     onSelect={(newDate) => {
-                        // Update state with the selected date
-
-                        // Convert newDate to string if needed
                         const formattedDate = newDate ? dayjs(newDate).format('YYYY-MM-DD') : null;
                         setSelectedDate(newDate);
 

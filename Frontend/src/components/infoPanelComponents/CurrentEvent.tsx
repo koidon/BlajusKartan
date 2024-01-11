@@ -48,7 +48,7 @@ const CurrentEvent = ({event}: Props) => {
                                         <Separator className="my-3"/>
                                         <div className="mb-3">
                                             <p className="text-gray-800">
-                                                Inträffat: {event?.EventDate}
+                                                Inträffat: {event?.eventDate}
                                             </p>
                                             <p className="text-gray-800">
                                                 Publicerades:{" "}
@@ -81,7 +81,7 @@ const CurrentEvent = ({event}: Props) => {
                     </h3>
                     <Separator className="my-3"/>
                     <div className="mb-3">
-                        <p className="text-gray-800">Inträffat: {event?.EventDate}</p>
+                        <p className="text-gray-800">Inträffat: {event?.eventDate}</p>
                         <p className="text-gray-800">
                             Publicerades: {event?.policeEvent?.name.split(",")[0]?.trim()}
                         </p>
