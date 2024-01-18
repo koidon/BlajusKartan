@@ -13,6 +13,8 @@ import {EventEntity, EventResponse} from "@/Models/policeEvent.ts";
 import {Separator} from "@/components/ui/separator.tsx";
 import useGetBingNewsResult from "@/Hooks/useGetBingNewsResult.tsx";
 import DatePicker from "@/components/infoPanelComponents/DatePicker.tsx";
+import dayjs from "dayjs";
+import "dayjs/locale/sv.js"
 
 type Props = {
     events: EventResponse;
@@ -111,8 +113,8 @@ const InfoPanel = ({events, event}: Props) => {
                         <h3 className="mb-4 text-lg font-semibold">{event?.policeEvent?.name.split(",")[1].trim() + " i " + event?.policeEvent?.location.name}</h3>
                         <Separator className="my-3"/>
                         <div className="mb-3">
-                            <p className="text-gray-800">Inträffat: {event?.eventDate}</p>
-                            <p className="text-gray-800">Publicerades: {event?.policeEvent.name.split(",")[0].trim()}</p>
+                            <p className="text-gray-800">Inträffat: {event?.policeEvent.name.split(",")[0].trim()}</p>
+                            <p className="text-gray-800">Publicerades: {dayjs(event?.eventDate).locale("sv").format("D MMMM HH:mm")}</p>
                         </div>
                         <Separator className="my-3"/>
                         <a href={`https://polisen.se/${event?.policeEvent.url}`}

@@ -129,5 +129,18 @@ app.MapGet("/getPoliceEventById/{id}", async (int id, DataContext context) =>
     return Results.Ok(serviceResponse);
 });
 
+app.MapGet("/getBingNewsResults/{query}", async (string? query) =>
+{
+    var bingNewsKey = builder.Configuration["BingNewsKey"];
+    var httpClient = new HttpClient();
+
+    httpClient.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", bingNewsKey);
+    var apiUrl = $"https://api.bing.microsoft.com/v7.0/search?responseFilter=webpages&q={query}&count=5";
+    var response = await httpClient.GetStringAsync(apiUrl);
+    var bingNewsResponse = Newtonsoft.Json.JsonConvert.DeserializeObject<SearchResponse>(response);
+
+    return bingNewsResponse;
+});
+
 
 app.Run();

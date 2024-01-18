@@ -247,7 +247,6 @@ const EventMap = ({eventResponse}: Props) => {
                         })}
                     </MapContainer>
                 </div>
-                )
             </>
         )
     );
