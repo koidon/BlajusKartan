@@ -1,5 +1,4 @@
 import axios from "@/api/axiosInstance.ts";
-
 type Webpage = {
     about: unknown; // Update the type of 'about' to match the actual data structure
     dateLastCrawled: string;
@@ -31,6 +30,7 @@ type SearchResponse = {
     webPages: WebAnswer
 }
 
+const apiKey = import.meta.env.VITE_BINGNEWS_KEY;
 
 export const getBingNewsResults = async (q: string | undefined) => {
     const params = {
@@ -41,7 +41,7 @@ export const getBingNewsResults = async (q: string | undefined) => {
     const response = await axios.get<SearchResponse>(
         'https://api.bing.microsoft.com/v7.0/search', {
             params, headers: {
-                'Ocp-Apim-Subscription-Key': 'a34207d862ca4db09b3254556bba2a4c'
+                'Ocp-Apim-Subscription-Key': apiKey
             }
         },
     );
