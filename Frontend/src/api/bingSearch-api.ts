@@ -1,8 +1,8 @@
 import axios from "@/api/axiosInstance.ts";
 type Webpage = {
-    about: unknown; // Update the type of 'about' to match the actual data structure
+    about: unknown;
     dateLastCrawled: string;
-    contractualRules: unknown; // Update the type of 'contractualRules' to match the actual data structure
+    contractualRules: unknown;
     deepLinks: Webpage[];
     displayUrl: string;
     id?: string;
@@ -11,7 +11,7 @@ type Webpage = {
     language: string;
     malware: unknown;
     name: string;
-    mentions: object; // Update the type of 'mentions' to match the actual data structure
+    mentions: object;
     searchTags: unknown;
     snippet: string;
     url: string;
@@ -30,20 +30,9 @@ type SearchResponse = {
     webPages: WebAnswer
 }
 
-const apiKey = import.meta.env.VITE_BINGNEWS_KEY;
-
-export const getBingNewsResults = async (q: string | undefined) => {
-    const params = {
-        responseFilter: 'webpages',
-        q: q,
-        count: '5'
-    };
+export const getBingNewsResults = async (query: string | undefined) => {
     const response = await axios.get<SearchResponse>(
-        'https://api.bing.microsoft.com/v7.0/search', {
-            params, headers: {
-                'Ocp-Apim-Subscription-Key': apiKey
-            }
-        },
+        `/getBingNewsResults/${query}`,
     );
     return response.data;
 };
