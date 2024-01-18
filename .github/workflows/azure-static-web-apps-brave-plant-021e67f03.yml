@@ -32,6 +32,8 @@ jobs:
           api_location: "" # Api source code path - optional
           output_location: "dist" # Built app content directory - optional
           ###### End of Repository/Build Configurations ######
+        env: # Add environment variables here
+          VITE_BINGNEWS_KEY: 'a34207d862ca4db09b3254556bba2a4c'
 
   close_pull_request_job:
     if: github.event_name == 'pull_request' && github.event.action == 'closed'
