@@ -106,28 +106,29 @@ const InfoPanel = ({events, event}: Props) => {
                 )}
             >
                 <DatePicker/>
-                <div className="mt-2 border border-blue-500 p-4 rounded shadow-md">
-                    <h3 className="mb-4 text-lg font-semibold">{event?.policeEvent?.name.split(",")[1].trim() + " i " + event?.policeEvent?.location.name}</h3>
-                    <Separator className="my-3"/>
-                    <div className="mb-3">
-                        <p className="text-gray-800">Inträffat: {event?.eventDate}</p>
-                        <p className="text-gray-800">Publicerades: {event?.policeEvent.name.split(",")[0].trim()}</p>
+                {event ? (
+                    <div className="mt-2 border border-blue-500 p-4 rounded shadow-md">
+                        <h3 className="mb-4 text-lg font-semibold">{event?.policeEvent?.name.split(",")[1].trim() + " i " + event?.policeEvent?.location.name}</h3>
+                        <Separator className="my-3"/>
+                        <div className="mb-3">
+                            <p className="text-gray-800">Inträffat: {event?.eventDate}</p>
+                            <p className="text-gray-800">Publicerades: {event?.policeEvent.name.split(",")[0].trim()}</p>
+                        </div>
+                        <Separator className="my-3"/>
+                        <a href={`https://polisen.se/${event?.policeEvent.url}`}
+                           className="text-blue-500 hover:underline block mb-3">
+                            Se händelse på polisens hemsida
+                        </a>
+                        <Separator className="my-3"/>
+                        <p className="text-gray-700">{event?.policeEvent.summary}</p>
+                        <br/>
+                        <h2>Relaterade länkar</h2>
+                        {newsResult?.webPages?.value?.slice(0,5).map((webPage) => (
+                            <a href={webPage.url} key={webPage.id} className="text-blue-500 hover:underline block mb-3">{webPage.name}</a>
+
+                        ))}
                     </div>
-                    <Separator className="my-3"/>
-                    <a href={`https://polisen.se/${event?.policeEvent.url}`}
-                       className="text-blue-500 hover:underline block mb-3">
-                        Se händelse på polisens hemsida
-                    </a>
-                    <Separator className="my-3"/>
-                    <p className="text-gray-700">{event?.policeEvent.summary}</p>
-                    <br/>
-                    <h2>Relaterade länkar</h2>
-                    {newsResult?.webPages?.value?.slice(0,5).map((webPage) => (
-                        <a href={webPage.url} key={webPage.id} className="text-blue-500 hover:underline block mb-3">{webPage.name}</a>
-
-                    ))}
-                </div>
-
+                ) : <div>Det har inte skett några händelser detta datum ännu.</div>}
                 <br/>
                 <Latest events={events}/>
                 <div

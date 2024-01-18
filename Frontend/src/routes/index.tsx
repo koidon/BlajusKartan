@@ -1,6 +1,7 @@
 import {FileRoute, SearchSchemaInput} from "@tanstack/react-router";
 import "leaflet/dist/leaflet.css";
-
+//import {lazy} from "react";
+//const EventMap = lazy(() => import ("@/components/EventMap.tsx"));
 import EventMap from "@/components/EventMap.tsx";
 import useEventSubscription from "@/Hooks/policeEvent/useEventSubscription.tsx";
 import {useSuspenseQuery} from "@tanstack/react-query";

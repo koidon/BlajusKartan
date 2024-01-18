@@ -78,8 +78,8 @@ const EventMap = ({eventResponse}: Props) => {
     const {id} = useSearch({
         from: IndexRoute.id
     })
-    const defaultEventId = eventResponse.data.length > 0 ? eventResponse.data[0].id ?? 0 : 0;
-    const {data: event} = useGetEventById(date, id || defaultEventId);
+    const defaultEventId = eventResponse.data.length > 0 ? eventResponse.data[0].id : undefined;
+    const {data: event,} = useGetEventById(date, id || defaultEventId);
     const [isMapClicked, setIsMapClicked] = useState(false);
     const [isEventSelected, setIsEventSelected] = useState(false);
 
