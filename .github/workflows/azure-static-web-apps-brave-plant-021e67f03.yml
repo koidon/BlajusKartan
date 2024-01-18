@@ -33,7 +33,7 @@ jobs:
           output_location: "dist" # Built app content directory - optional
           ###### End of Repository/Build Configurations ######
         env: # Add environment variables here
-          VITE_BINGNEWS_KEY: 'a34207d862ca4db09b3254556bba2a4c'
+          VITE_BINGNEWS_KEY: ${{ vars.VITE_BINGNEWS_KEY}}
 
   close_pull_request_job:
     if: github.event_name == 'pull_request' && github.event.action == 'closed'
